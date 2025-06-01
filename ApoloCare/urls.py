@@ -17,13 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-
-from .views import logout_view, validaLogin
+from .views import logout_view, validaLogin, home
+from ApoloCare import views
 
 
 
 urlpatterns = [
-    #path('home/', views.home, name='home')  # exemplo
+    path('home/', views.home, name='home'),
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('valida-login/', validaLogin, name='valida_login'),

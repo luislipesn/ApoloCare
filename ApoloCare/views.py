@@ -5,6 +5,8 @@ from psycopg2 import sql
 from django.contrib.auth import logout
 from .database import conectar_banco
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth import login
 
 
 def validaLogin(request):
@@ -16,6 +18,7 @@ def validaLogin(request):
             username = request.POST["login"]
             senha = request.POST["senha"]
 
+            # Busca o hash da senha pelo username
             query = sql.SQL("SELECT id, password FROM auth_user WHERE username = %s")
             cursor.execute(query, (username,))
             resultado = cursor.fetchone()
@@ -23,21 +26,31 @@ def validaLogin(request):
             cursor.close()
             conn.close()
 
-            if resultado and check_password(senha, resultado[1]):
-                return redirect("home")  # essa URL precisa existir no seu urls.py
+            if resultado:
+                user_id, hashed_password = resultado
+
+                if check_password(senha, hashed_password):
+                    # Buscar o objeto User para criar sessão
+                    try:
+                        user = User.objects.get(pk=user_id)
+                        login(request, user)
+                        return redirect("home")
+                    except User.DoesNotExist:
+                        messages.error(request, "Usuário existe no banco, mas não no sistema.")
+                else:
+                    messages.error(request, "Senha incorreta.")
             else:
-                messages.error(request, "Usuário ou senha incorretos.")
-                return redirect("login")  # redireciona para login com mensagem de erro
+                messages.error(request, "Usuário não encontrado.")
 
         except Exception as e:
-            messages.error(request, f"Ocorreu um erro: {str(e)}")
-            return redirect("login")
+            messages.error(request, f"Erro ao tentar login: {str(e)}")
+
     return redirect("login")
 
 def logout_view(request):
     logout(request)
     return redirect('login')  # redireciona para a tela de login
 
-@login_required(login_url='login')
+@login_required
 def home(request):
-    return render(request, 'dashboard.html', {'user': request.user})
+    return render(request, 'home.html', {'user': request.user})
