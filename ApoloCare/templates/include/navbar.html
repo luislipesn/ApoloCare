@@ -12,6 +12,6 @@
     <!-- Usuário logado -->
     <div class="flex items-center gap-2">
         <img src="{% static 'images/user.png' %}" alt="Usuário" class="h-8 w-8">
-        <span>Olá, {{ request.user.username }}!</span>
+        <span class="font-sans text-lg text-white">Olá, {{ request.user.username }}!</span>
     </div>
 </nav>
