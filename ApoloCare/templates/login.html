@@ -15,7 +15,14 @@
     <!-- Coluna Esquerda (Formulário) -->
     <div class="w-1/2 flex flex-col justify-center items-center bg-gradient-to-br from-black to-indigo-600 text-white">
       <h1 class="text-4xl font-bold mb-8">ApoloCare</h1>
-      <form method="post" class="w-2/3 max-w-md">
+      <form method="post" action="{% url 'valida_login' %}" class="w-2/3 max-w-md">
+        {% if messages %}
+        <ul class="mb-4 text-red-500">
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
         {% csrf_token %}
         <label for="username" class="block mb-2">Usuário:</label>
         <input type="text" name="login" id="username" class="w-full mb-4 px-4 py-2 rounded-full text-black" />

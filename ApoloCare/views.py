@@ -1,30 +1,33 @@
-
-from django.shortcuts import redirect, render
-from ApoloCare.ApoloCare.database import conectar_banco
-from psycopg2 import sql
-from django.contrib.auth.hashers import make_password
+from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+from psycopg2 import sql
+from .database import conectar_banco
 
 def validaLogin(request):
-    
-    if request.method == 'POST':
-        conn = conectar_banco()
-        cursor = conn.cursor()
-        username = request.POST['username']
-        senha = make_password(request.POST['username'])
+    if request.method == "POST":
+        try:
+            conn = conectar_banco()
+            cursor = conn.cursor()
 
-        query = sql.SQL("SELECT id FROM auth_user WHERE username = %s AND password = %s")
-        cursor.execute(query,(username, senha))
+            username = request.POST["login"]
+            senha = request.POST["senha"]
 
-        resultado = cursor.fetchone()
+            query = sql.SQL("SELECT id, password FROM auth_user WHERE username = %s")
+            cursor.execute(query, (username,))
+            resultado = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
+            cursor.close()
+            conn.close()
 
-        if resultado is not None:
-            return redirect('home')
-        else:
-            messages.error(request, 'Senha incorreta.')
-    
-    return render(request, 'login.html')
+            if resultado and check_password(senha, resultado[1]):
+                return redirect("home")  # essa URL precisa existir no seu urls.py
+            else:
+                messages.error(request, "Usuário ou senha incorretos.")
+                return redirect("login")  # redireciona para login com mensagem de erro
 
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {str(e)}")
+            return redirect("login")
+
+    return redirect("login")

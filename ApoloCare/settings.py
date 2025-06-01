@@ -75,7 +75,6 @@ WSGI_APPLICATION = 'ApoloCare.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": config("DB_NAME"),
@@ -83,6 +82,9 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),
         "PORT": config("DB_PORT"),
+        "OPTIONS": {
+            "client_encoding": "UTF8",
+        },
     }
 }
 
