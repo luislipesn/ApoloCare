@@ -1,32 +1,15 @@
-{% load static %}
-<nav class="bg-white shadow-md px-6 py-3 flex justify-between items-center">
-  <!-- Logo ou título -->
-  <div class="text-xl font-bold text-indigo-600">
-    ApoloCare
-  </div>
+<nav class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md">
+    <!-- Logout -->
+    <a href="{% url 'logout' %}" title="Sair">
+        <img src="{% static 'images/logout.png' %}" alt="Logout" class="h-8 w-8 hover:opacity-80">
+    </a>
 
-  <!-- Área do usuário -->
-  <div class="flex items-center space-x-4">
-    <!-- Ícone de usuário + nome -->
-    <div class="flex items-center text-gray-700 font-medium">
-      <!-- Ícone SVG -->
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M5.121 17.804A8.966 8.966 0 0112 15a8.966 8.966 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-      </svg>
-      Olá, {{ request.user.username }}
+    <!-- Título Central -->
+    <h1 class="text-2xl font-bold">ApoloCare</h1>
+
+    <!-- Usuário logado -->
+    <div class="flex items-center gap-2">
+        <img src="{% static 'images/user.png' %}" alt="Usuário" class="h-8 w-8">
+        <span>Olá, {{ request.user.username }}!</span>
     </div>
-
-    <!-- Botão de logout -->
-    <form action="{% url 'logout' %}" method="post">
-      {% csrf_token %}
-      <button type="submit" title="Sair" class="text-red-600 hover:text-red-800">
-        <!-- Ícone SVG logout -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
-        </svg>
-      </button>
-    </form>
-  </div>
 </nav>
