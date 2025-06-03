@@ -18,22 +18,21 @@ def validaLogin(request):
             username = request.POST["login"]
             senha = request.POST["senha"]
 
-            # Busca o hash da senha pelo username
-            query = sql.SQL("SELECT id, password FROM auth_user WHERE username = %s")
+            query = sql.SQL("SELECT id, password, first_name, username FROM auth_user WHERE username = %s")
             cursor.execute(query, (username,))
             resultado = cursor.fetchone()
-
             cursor.close()
             conn.close()
 
             if resultado:
-                user_id, hashed_password = resultado
+                user_id, hashed_password, nome, usuario = resultado
 
                 if check_password(senha, hashed_password):
-                    # Buscar o objeto User para criar sessão
                     try:
                         user = User.objects.get(pk=user_id)
                         login(request, user)
+                        request.session['first_name'] = nome
+                        request.session['username'] = usuario
                         return redirect("home")
                     except User.DoesNotExist:
                         messages.error(request, "Usuário existe no banco, mas não no sistema.")
