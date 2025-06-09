@@ -7,6 +7,7 @@ from .database import conectar_banco
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from .models import Nutricionista
 
 
 def validaLogin(request):
@@ -53,3 +54,8 @@ def logout_view(request):
 @login_required
 def home(request):
     return render(request, 'home.html', {'user': request.user})
+
+@login_required
+def lista_nutricionistas(request):
+    nutricionistas = Nutricionista.objects.all()
+    return render(request, 'cadastro_nutricionista.html', {'nutricionistas': nutricionistas})

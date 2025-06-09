@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container" style="background: linear-gradient(to right, #5bd3de, #0c5fd9); min-height: 100vh; padding: 2rem; position: relative;">
+    
+    <!-- Navbar -->
+    {% include 'navbar.html' %}
+
+    <h2 style="text-align: center; font-weight: bold; margin-top: 2rem;">Cadastro de Nutricionista</h2>
+
+    <!-- Botão de Incluir -->
+    <div style="text-align: right; margin: 1rem 0;">
+        <a href="{% url 'criar_nutricionista' %}" class="btn" style="background-color: #00c9a7; color: white; font-weight: bold; border-radius: 30px; padding: 10px 20px;">
+            Incluir
+            <img src="{% static 'icons/add_file.png' %}" alt="Incluir" width="20" style="margin-left: 5px;">
+        </a>
+    </div>
+
+    <!-- Tabela -->
+    <table class="table" style="background-color: white;">
+        <thead style="background-color: #d3dd59;">
+            <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>CRN</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nutricionista in nutricionistas %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ nutricionista.nome }}</td>
+                <td>{{ nutricionista.crn }}</td>
+                <td>
+                    <a href="{% url 'editar_nutricionista' nutricionista.id %}">
+                        <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" width="20">
+                    </a>
+                    <a href="{% url 'deletar_nutricionista' nutricionista.id %}" onclick="return confirm('Tem certeza que deseja excluir?')">
+                        <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" width="20">
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">Nenhum nutricionista cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Botão Voltar -->
+    <a href="{% url 'home' %}" style="position: absolute; bottom: 20px; left: 20px;">
+        <img src="{% static 'icons/back_arrow.png' %}" alt="Voltar" width="40">
+    </a>
+</div>
+{% endblock %}
