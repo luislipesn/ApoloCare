@@ -27,16 +27,12 @@ def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
 
             if resultado:
                 user_id, hashed_password, nome, usuario = resultado
-                print(senha, " + ", make_password(senha))
                 if check_password(senha, hashed_password): #CHECA SE A SENHA ESTA CORRETA
-                    try:
-                        user = User.objects.get(pk=user_id)
-                        login(request, user)
-                        request.session['first_name'] = nome
-                        request.session['username'] = usuario
-                        return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOME
-                    except User.DoesNotExist:
-                        messages.error(request, "Usuário existe no banco, mas não no sistema.")
+                    user = User.objects.get(pk=user_id)
+                    login(request, user)
+                    request.session['first_name'] = nome #GUARDA O NOME NA SESSÃO
+                    request.session['username'] = usuario
+                    return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
                 else:
                     messages.error(request, "Senha incorreta.")
             else:
