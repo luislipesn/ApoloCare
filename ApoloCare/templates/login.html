@@ -16,7 +16,7 @@
     <div class="w-1/2 flex flex-col justify-center items-center bg-gradient-to-br from-black to-indigo-600 text-white">
       <h1 class="text-4xl font-bold mb-8">ApoloCare</h1>
       <form method="post" action="{% url 'valida_login' %}" class="w-2/3 max-w-md">
-        {% if messages %}
+        {% if messages %} <!--Caso possua alguma mensagem referente ao login-->
         <ul class="mb-4 text-red-500">
           {% for message in messages %}
           <li>{{ message }}</li>

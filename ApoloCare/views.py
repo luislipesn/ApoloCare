@@ -34,7 +34,7 @@ def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
                     request.session['username'] = usuario
                     return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
                 else:
-                    messages.error(request, "Senha incorreta.")
+                    messages.error(request, "Senha incorreta.") #CASO A SENHA ESTEJA INCORRETA INFORMAR NA TELA
             else:
                 messages.error(request, "Usuário não encontrado.")
 
