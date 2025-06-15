@@ -18,21 +18,26 @@ def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
             username = request.POST["login"] #ATRIBUIÇÃO PARA A VARIAVEL LOGIN A INFORMAÇÃO VINDA DO HTML
             senha = request.POST["senha"] #ATRIBUIÇÃO PARA A VARIAVEL SENHA A INFORMAÇÃO VINDA DO HTML
 
-            query = sql.SQL("SELECT id_usuario, senha, nome, login FROM Usuario WHERE login = %s") #PROCURA NO BANCO DE DADOS 
+            query = sql.SQL("SELECT id_usuario, senha, nome, login, tipo_usuario, ativo FROM Usuario WHERE login = %s") #PROCURA NO BANCO DE DADOS 
             cursor.execute(query, (username,))
             resultado = cursor.fetchone()
             cursor.close()
-            conn.close()
+            conn.close() #Fechando conexão
 
             if resultado:
-                user_id, hashed_password, nome, usuario = resultado
-                if check_password(senha, hashed_password): #CHECA SE A SENHA ESTA CORRETA
-                    request.session['id_usuario'] = user_id
-                    request.session['nome'] = nome #GUARDA O NOME NA SESSÃO
-                    request.session['login'] = usuario
-                    return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
+                user_id, hashed_password, nome, usuario, tipo_usuario, ativo = resultado
+                if ativo: #Verifica se o usuário está ativo ou não
+                    if check_password(senha, hashed_password): #CHECA SE A SENHA ESTA CORRETA
+                        request.session['id_usuario'] = user_id
+                        request.session['nome'] = nome #GUARDA O NOME NA SESSÃO
+                        request.session['login'] = usuario
+                        request.session['tipo_usuario'] = tipo_usuario
+                        request.session['ativo'] = ativo
+                        return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
+                    else:
+                        messages.error(request, "Usuário e/ou Senha incorretos.") #CASO A SENHA ESTEJA INCORRETA INFORMAR NA TELA
                 else:
-                    messages.error(request, "Usuário e/ou Senha incorretos.") #CASO A SENHA ESTEJA INCORRETA INFORMAR NA TELA
+                    messages.error(request, "Usuário bloqueado!")
             else:
                 messages.error(request, "Usuário e/ou Senha incorretos.")
 
