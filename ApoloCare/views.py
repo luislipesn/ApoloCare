@@ -4,12 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from psycopg2 import sql
 from django.contrib.auth import logout
-
 from .decorators import usuario_logado
 from .database import conectar_banco
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.contrib.auth import login
 from Nutricionista.models import Nutricionista
 
 
