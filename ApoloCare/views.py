@@ -4,9 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from psycopg2 import sql
 from django.contrib.auth import logout
+from Nutricionista.views import consulta_nutri
 from .decorators import usuario_logado
 from .database import conectar_banco
-from Nutricionista.models import Nutricionista
 
 
 def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
@@ -56,8 +56,11 @@ def home(request):
 
 @usuario_logado
 def nutricionista(request):
-    
-    return render(request, 'nutricionista.html', {'user': request.user})
+    dados_nutri = consulta_nutri(request)  # chama a função para obter os dados
+    contexto = {
+        "nutricionistas": dados_nutri
+    }
+    return render(request, 'nutricionista.html', contexto)
 
 def cadastro_usuario(request):
     return render(request,'cadastro_usuario.html')

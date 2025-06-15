@@ -21,23 +21,23 @@
     <table class="min-w-full bg-white rounded shadow">
       <thead class="bg-yellow-300 text-black">
         <tr>
-          <th class="py-2 px-4">Código</th>
+          <th class="py-2 px-4">ID</th>
           <th class="py-2 px-4">Nome</th>
           <th class="py-2 px-4">CRN</th>
           <th class="py-2 px-4">Ações</th>
         </tr>
       </thead>
       <tbody>
-        {% for nutricionista in nutricionistas %}
+        {% for nutri in nutricionistas %}
         <tr class="border-t">
-          <td class="py-2 px-4">{{ forloop.counter }}</td>
-          <td class="py-2 px-4">{{ nutricionista.nome }}</td>
-          <td class="py-2 px-4">{{ nutricionista.crn }}</td>
+          <td class="py-2 px-4">{{ nutri.0 }}</td>
+          <td class="py-2 px-4">{{ nutri.1 }}</td>
+          <td class="py-2 px-4">{{ nutri.2 }}</td>
           <td class="py-2 px-4 flex gap-2">
-            <a href="{% url 'editar_nutricionista' nutricionista.id %}">
+            <a href="{% url 'editar_nutricionista' nutricionista.0 %}">
               <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" class="w-5">
             </a>
-            <a href="{% url 'deletar_nutricionista' nutricionista.id %}" onclick="return confirm('Tem certeza que deseja excluir?')">
+            <a href="{% url 'deletar_nutricionista' nutricionista.0 %}" onclick="return confirm('Tem certeza que deseja excluir?')">
               <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" class="w-5">
             </a>
           </td>

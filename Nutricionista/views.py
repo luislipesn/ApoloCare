@@ -12,8 +12,7 @@ def consulta_nutri(request):
 
     query = sql.SQL("SELECT id_nutricionista, nome, crn FROM nutricionista")
     cursor.execute(query)
-    resultado = cursor.fetchall
+    resultado = cursor.fetchall()
     cursor.close()
     conn.close()
-
     return resultado
