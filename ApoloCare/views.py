@@ -1,8 +1,11 @@
+import re
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from psycopg2 import sql
 from django.contrib.auth import logout
+
+from .decorators import usuario_logado
 from .database import conectar_banco
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -19,7 +22,7 @@ def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
             username = request.POST["login"] #ATRIBUIÇÃO PARA A VARIAVEL LOGIN A INFORMAÇÃO VINDA DO HTML
             senha = request.POST["senha"] #ATRIBUIÇÃO PARA A VARIAVEL SENHA A INFORMAÇÃO VINDA DO HTML
 
-            query = sql.SQL("SELECT id, password, first_name, username FROM auth_user WHERE username = %s") #PROCURA NO BANCO DE DADOS 
+            query = sql.SQL("SELECT id_usuario, senha, nome, login FROM Usuario WHERE login = %s") #PROCURA NO BANCO DE DADOS 
             cursor.execute(query, (username,))
             resultado = cursor.fetchone()
             cursor.close()
@@ -28,18 +31,17 @@ def validaLogin(request): #CLASSE DE VALIDAÇÃO DO LOGIN
             if resultado:
                 user_id, hashed_password, nome, usuario = resultado
                 if check_password(senha, hashed_password): #CHECA SE A SENHA ESTA CORRETA
-                    user = User.objects.get(pk=user_id)
-                    login(request, user)
-                    request.session['first_name'] = nome #GUARDA O NOME NA SESSÃO
-                    request.session['username'] = usuario
+                    request.session['id_usuario'] = user_id
+                    request.session['nome'] = nome #GUARDA O NOME NA SESSÃO
+                    request.session['login'] = usuario
                     return redirect("home") #CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
                 else:
-                    messages.error(request, "Senha incorreta.") #CASO A SENHA ESTEJA INCORRETA INFORMAR NA TELA
+                    messages.error(request, "Usuário e/ou Senha incorretos.") #CASO A SENHA ESTEJA INCORRETA INFORMAR NA TELA
             else:
-                messages.error(request, "Usuário não encontrado.")
+                messages.error(request, "Usuário e/ou Senha incorretos.")
 
         except Exception as e:
-            messages.error(request, f"Erro ao tentar login: {str(e)}")
+            messages.error(request, f"Erro ao tentar login: {str(e)}") #CASO DÊ ERRO NA CONEXÃO COM O BANCO
 
     return redirect("login")
 
@@ -47,15 +49,46 @@ def logout_view(request):
     logout(request)
     return redirect('login')  # redireciona para a tela de login
 
-@login_required
+@usuario_logado
 def home(request):
     return render(request, 'home.html', {'user': request.user})
 
-@login_required
+@usuario_logado
 def lista_nutricionistas(request):
     nutricionistas = Nutricionista.objects.all()
     return render(request, 'cadastro_nutricionista.html', {'nutricionistas': nutricionistas})
 
-@login_required
+@usuario_logado
 def nutricionista(request):
     return render(request, 'nutricionista.html', {'user': request.user})
+
+def cadastro_usuario(request):
+    return render(request,'cadastro_usuario.html')
+
+def inclusao_usuario(request):
+    try:
+        if request.method == "POST":
+            nome = request.POST['nome']
+            dt_nasc = request.POST['dt_nasc']
+            cpf = re.sub(r'\D', '', request.POST['cpf'])
+            telefone = re.sub(r'\D', '', request.POST['telefone'])
+            tipo_usuario = request.POST['tipo_usuario']
+            endereco = request.POST['endereco']
+            login = request.POST['login']
+            senha = make_password(request.POST['senha'])
+            ativo = bool(request.POST['ativo'])
+
+            conn = conectar_banco() 
+            cursor = conn.cursor()
+
+            query = sql.SQL("INSERT INTO Usuario(nome, dt_nasc, cpf, telefone, endereco, tipo_usuario, login, senha, ativo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+            cursor.execute(query, (nome, dt_nasc, cpf, telefone, endereco, tipo_usuario, login, senha, ativo))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect('login')
+    except Exception as e:
+            messages.error(request, f"Erro ao tentar login: {str(e)}") #CASO DÊ ERRO NA CONEXÃO COM O BANCO
+            return redirect('cadastro_usuario')
+
+

@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import logout_view, nutricionista, validaLogin, home
+from .views import cadastro_usuario, inclusao_usuario, logout_view, nutricionista, validaLogin, home
 from ApoloCare import views
 
 
@@ -30,5 +30,8 @@ urlpatterns = [
     path('valida-login/', validaLogin, name='valida_login'),
     path('logout/', logout_view, name='logout'),
     path('nutricionista/', nutricionista, name='nutricionista'),
+    path('cadastro_usuario/', cadastro_usuario, name='cadastro_usuario'),
+    path('inclusao_usuario/', inclusao_usuario, name='inserir-usuario'),
+
     
 ]
