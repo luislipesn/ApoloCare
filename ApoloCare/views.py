@@ -55,12 +55,8 @@ def home(request):
     return render(request, 'home.html', {'user': request.user})
 
 @usuario_logado
-def lista_nutricionistas(request):
-    nutricionistas = Nutricionista.objects.all()
-    return render(request, 'cadastro_nutricionista.html', {'nutricionistas': nutricionistas})
-
-@usuario_logado
 def nutricionista(request):
+    
     return render(request, 'nutricionista.html', {'user': request.user})
 
 def cadastro_usuario(request):
