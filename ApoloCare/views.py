@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from psycopg2 import sql
 from django.contrib.auth import logout
-from Nutricionista.views import consulta_nutri
 from .decorators import usuario_logado
 from .database import conectar_banco
 
@@ -54,14 +53,6 @@ def logout_view(request):
 def home(request):
     return render(request, 'home.html', {'user': request.user})
 
-@usuario_logado
-def nutricionista(request):
-    dados_nutri = consulta_nutri(request)  # chama a função para obter os dados
-    contexto = {
-        "nutricionistas": dados_nutri
-    }
-    return render(request, 'nutricionista.html', contexto)
-
 def cadastro_usuario(request):
     return render(request,'cadastro_usuario.html')
 
@@ -78,6 +69,8 @@ def inclusao_usuario(request):
             senha = make_password(request.POST['senha'])
             ativo = bool(request.POST['ativo'])
 
+            print(ativo)
+
             conn = conectar_banco() 
             cursor = conn.cursor()
 
@@ -86,9 +79,10 @@ def inclusao_usuario(request):
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect('login')
+            return redirect('nutricionista')
     except Exception as e:
-            messages.error(request, f"Erro ao tentar login: {str(e)}") #CASO DÊ ERRO NA CONEXÃO COM O BANCO
-            return redirect('cadastro_usuario')
+            messages.error(request, f"Erro ao cadastrar: {str(e)}") #CASO DÊ ERRO NA CONEXÃO COM O BANCO
+    
+    return redirect("cadastro_nutricionista")
 
 
