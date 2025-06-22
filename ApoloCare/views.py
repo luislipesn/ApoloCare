@@ -14,9 +14,7 @@ def validaLogin(request):  # CLASSE DE VALIDAÇÃO DO LOGIN
             conn = conectar_banco()  # CONEXÃO COM O BANCO DE DADOS
             cursor = conn.cursor()
 
-            username = request.POST[
-                "login"
-            ]  # ATRIBUIÇÃO PARA A VARIAVEL LOGIN A INFORMAÇÃO VINDA DO HTML
+            username = request.POST["login"].lower()  # ATRIBUIÇÃO PARA A VARIAVEL LOGIN A INFORMAÇÃO VINDA DO HTML
             senha = request.POST[
                 "senha"
             ]  # ATRIBUIÇÃO PARA A VARIAVEL SENHA A INFORMAÇÃO VINDA DO HTML
@@ -81,7 +79,7 @@ def inclusao_usuario(request):
             telefone = re.sub(r"\D", "", request.POST["telefone"])
             tipo_usuario = request.POST["tipo_usuario"]
             endereco = request.POST["endereco"]
-            login = request.POST["login"]
+            login = request.POST["login"].lower()
             senha = make_password(request.POST["senha"])
             ativo = bool(request.POST["ativo"])
 
