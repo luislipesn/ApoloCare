@@ -71,7 +71,7 @@ def inclusao_nutricionista(request):
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect("nutricionista")
+        return redirect("nutricionista")
     except Exception as e:
         messages.error(request, f"{str(e)}")
         id_nutricionista = request.POST.get("id_nutricionista")
