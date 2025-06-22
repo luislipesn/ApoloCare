@@ -22,7 +22,7 @@
        {% if dados_nutri %}
       <div class="flex flex-col w-1/4">
         <label class="text-black font-semibold mb-1">Código:</label>
-        <input type="text" name="id_nutricionista" value="{{ dados_nutri.0|default_if_none:'' }}"
+        <input type="text" name="id_nutricionista" value="{{ dados_nutri.0 }}"
           class="bg-gray-300 text-center font-bold rounded-full px-4 py-2" readonly>
       </div>
       {% endif %}
@@ -51,7 +51,7 @@
       <!-- Data de Nascimento -->
       <div>
         <label for="data_nascimento">Data de Nasc.:</label>
-        <input type="date" id="data_nascimento" name="data_nascimento" value="{{ dados_nutri.4|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" required/>
+        <input type="date" id="data_nascimento" name="data_nascimento" value="{% if dados_nutri and dados_nutri.4 %}{{ dados_nutri.4|date:'Y-m-d' }}{% endif %}" class="w-full rounded-full px-4 py-2" required/>
       </div>
     </div>
 

@@ -40,11 +40,11 @@
           <td class="py-2 px-4">{{ nutri.2 }}</td>
           <td class="py-2 px-4 flex gap-2">
             <a href="{% url 'editar_nutricionista' nutri.0 %}">
-              <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" class="w-5">
+              <img src="{% static 'images/edit_icon.png' %}" alt="Editar" class="w-5">
             </a>
             <a href="{% url 'deletar_nutricionista' nutri.0 %}"
               onclick="return confirm('Tem certeza que deseja excluir?')">
-              <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" class="w-5">
+              <img src="{% static 'images/delete_icon.png' %}" alt="Excluir" class="w-5">
             </a>
           </td>
         </tr>

@@ -55,9 +55,10 @@ def inclusao_nutricionista(request):
 
             conn = conectar_banco()
             cursor = conn.cursor()
+            id = request.POST.get('id_nutricionista', None)
 
-            if request.POST["id_nutricionista"]:
-                id = request.POST["id_nutricionista"]
+
+            if id:
                 query = sql.SQL(
                     "UPDATE Nutricionista SET nome=%s, cpf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s WHERE id_nutricionista=%s"
                 )
@@ -72,11 +73,10 @@ def inclusao_nutricionista(request):
             conn.close()
             return redirect("nutricionista")
     except Exception as e:
-        messages.error(
-            request, f"{str(e)}"
-        )  # CASO DÊ ERRO NA CONEXÃO COM O BANCO
-        if request.POST["id_nutricionista"]:
-            return redirect("/cadastro_nutricionista/" + request.POST['id_nutricionista'] + "/")
+        messages.error(request, f"{str(e)}")
+        id_nutricionista = request.POST.get("id_nutricionista")
+        if id_nutricionista:
+            return redirect(f"/cadastro_nutricionista/{id_nutricionista}/")
         
 
 @usuario_logado
