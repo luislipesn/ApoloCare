@@ -40,9 +40,7 @@ def validaLogin(request):  # CLASSE DE VALIDAÇÃO DO LOGIN
                         request.session["login"] = usuario
                         request.session["tipo_usuario"] = tipo_usuario
                         request.session["ativo"] = ativo
-                        contexto = {"tipo_usuario": request.session.get("tipo_usuario")}
-                        return render(
-                            request, "home.html", contexto)  # CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
+                        return redirect("home") # CASO O LOGIN E A SENHA ESTIVEREM CORRETOS, REDIRECIONAR PARA A PAGINA HOMEF
                     else:
                         messages.error(
                             request, "Usuário e/ou Senha incorretos."
