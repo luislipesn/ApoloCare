@@ -30,7 +30,7 @@
       <!-- Nome -->
       <div class="flex flex-col flex-1">
         <label class="text-black font-semibold mb-1">Nome:</label>
-        <input type="text" name="nome" value="{{ dados_nutri.1|default_if_none:'' }}" required class="bg-white rounded-full px-4 py-2 border border-gray-300">
+        <input type="text" name="nome" value="{{ dados_nutri.1|default_if_none:'' }}" required class="bg-white rounded-full px-4 py-2 border border-gray-300" maxlength="150">
       </div>
     </div>
 
@@ -45,7 +45,7 @@
       <!-- CRN -->
       <div>
         <label for="crn">CRN:</label>
-        <input type="text" id="crn" name="crn" value="{{ dados_nutri.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" required />
+        <input type="text" id="crn" name="crn" value="{{ dados_nutri.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" maxlength="10" required />
       </div>
 
       <!-- Data de Nascimento -->

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pacientes{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-cyan-300 to-blue-700 p-6 text-black">
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Pacientes</h1>
+        <a href="{% url 'cadastro_paciente' %}"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-2 rounded-full flex items-center">
+            Incluir
+            <img src="{% static 'images/incluir.png' %}" alt="Novo" class="ml-2 w-5">
+        </a>
+    </div>
+
+    <table class="min-w-full bg-white rounded shadow">
+        <thead class="bg-yellow-300 text-black">
+            <tr>
+                <th class="py-2 px-4">ID</th>
+                <th class="py-2 px-4">Nome</th>
+                <th class="py-2 px-4">CPF</th>
+                <th class="py-2 px-4">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in pacientes %}
+            <tr class="border-t">
+                <td class="py-2 px-4">{{ paciente.0 }}</td>
+                <td class="py-2 px-4">{{ paciente.1 }}</td>
+                <td class="py-2 px-4">{{ paciente.3 }}</td>
+                <td class="py-2 px-4 flex gap-2">
+                    <!-- Formulário para edição -->
+                    <form action="{% url 'cadastro_paciente' paciente.0 %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-transparent">
+                            <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" class="w-5">
+                        </button>
+                    </form>
+
+                    <!-- Formulário para exclusão -->
+                    <form action="{% url 'deletar_paciente' paciente.0 %}" method="post"
+                        onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-transparent">
+                            <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" class="w-5">
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-4">Nenhum paciente cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-6">
+        <a href="{% url 'home' %}"
+            class="inline-flex items-center bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-2 rounded-full">
+            <img src="{% static 'images/voltar.png' %}" alt="Voltar" class="w-5 mr-2">
+            Voltar
+        </a>
+    </div>
+    {% endblock %}

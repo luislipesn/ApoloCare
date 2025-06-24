@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
+from Paciente.views import paciente
 from Nutricionista.views import cadastro_nutricionista, excluir_nutricionista, inclusao_nutricionista, nutricionista
 from .views import cadastro_usuario, inclusao_usuario, logout_view, validaLogin, home
 from ApoloCare import views
@@ -36,7 +37,9 @@ urlpatterns = [
     path('cadastro_nutricionista/', cadastro_nutricionista, name='cadastro_nutricionista'),
     path('cadastro_nutricionista/<int:id>/', cadastro_nutricionista, name='editar_nutricionista'),
     path('inserir_nutricionista/', inclusao_nutricionista, name='inclusao_nutricionista'),
-    path('deletar_nutricionista/<int:id>/', excluir_nutricionista, name='deletar_nutricionista')
+    path('deletar_nutricionista/', excluir_nutricionista, name='deletar_nutricionista'),
+    path('paciente', paciente, name="paciente"),
+
 
 
 ]
