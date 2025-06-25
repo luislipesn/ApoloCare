@@ -65,6 +65,8 @@ def logout_view(request):
 def home(request):
     return render(request, "home.html", {"user": request.user})
 
+def login(request):
+    return render (request, "login.html")
 
 def cadastro_usuario(request):
     return render(request, "cadastro_usuario.html")
