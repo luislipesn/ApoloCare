@@ -8,7 +8,11 @@
 <div class="min-h-screen bg-gradient-to-r from-cyan-300 to-blue-700 p-6 text-black relative">
 
   <h1 class="text-center text-2xl font-bold mb-6">Cadastro de Usuário</h1>
-
+  {% if messages %}
+  {% for message in messages %}
+  {{ message }}
+  {% endfor %}
+  {% endif %}
   <form method="POST" action="{% url 'inserir-usuario' %}" class="max-w-3xl mx-auto bg-white p-6 rounded shadow-md">
     {% csrf_token %}
 
@@ -68,7 +72,7 @@
 
     <!-- Ativo -->
     <div class="mb-4 flex items-center">
-      <input type="checkbox" name="ativo" id="ativo" class="mr-2">
+      <input type="checkbox" name="ativo" id="ativo" class="mr-2" {% if dados_user %}{% if dados_user == 'true' %} checked {% elif dados_user == 'false' %} {% else %} checked {% endif %} {% endif %}>
       <label for="ativo" class="font-semibold">Usuário ativo</label>
     </div>
 
@@ -97,10 +101,6 @@
     });
 
   </script>
-  {% if messages %}
-  {% for message in messages %}
-  {{ message }}
-  {% endfor %}
-  {% endif %}
+
 </div>
 {% endblock %}
