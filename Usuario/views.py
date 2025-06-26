@@ -58,7 +58,7 @@ def validaLogin(request):  # CLASSE DE VALIDAÇÃO DO LOGIN
 def login(request):
     return render (request, "login.html")
 
-def logout(request):
+def logout_view(request):
     logout(request)
     return redirect("login")  # redireciona para a tela de login
 
