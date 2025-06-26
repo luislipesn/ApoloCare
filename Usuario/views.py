@@ -103,7 +103,7 @@ def inclusao_usuario(request):
             conn.commit()
             cursor.close()
             conn.close()
-            return redirect("login")
+        return redirect("login")
     except Exception as e:
         messages.error(
             request, f"Erro ao cadastrar: {str(e)}"

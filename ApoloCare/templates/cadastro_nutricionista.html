@@ -7,7 +7,13 @@
 <div class="min-h-screen bg-gradient-to-r from-cyan-400 to-blue-800 p-6 text-black">
 
   <!-- Título -->
+  {% if dados_nutri %}
+  <h1 class="text-center text-2xl font-bold text-black mb-6">Edição de Nutricionista</h1>
+  {% else %}
   <h1 class="text-center text-2xl font-bold text-black mb-6">Cadastro de Nutricionista</h1>
+  {% endif %}
+
+
   {% if messages %}
   {% for message in messages %}
   {{ message }}
