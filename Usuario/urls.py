@@ -1,10 +1,9 @@
 from django.urls import path
 
-from .views import cadastro_usuario, inclusao_usuario, login, logout_view, validaLogin
+from .views import cadastro_usuario, inclusao_usuario, logout_view, validaLogin
 
 
 urlpatterns = [
-    path('login/', login, name='login'),
     path('valida-login/', validaLogin, name='valida_login'),
     path('logout/', logout_view, name='logout'),
     path('cadastro_usuario/', cadastro_usuario, name='cadastro_usuario'),
