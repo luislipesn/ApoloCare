@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from psycopg2 import sql
@@ -73,21 +74,10 @@ def inclusao_nutricionista(request):
             cursor.close()
             conn.close()
         return redirect("nutricionista")
+    
     except Exception as e:
         messages.error(request, f"{str(e)}")
-        if id:
-            dados_nutri = {
-                0 : request.POST.get("id_nutricionista"),
-                1 : request.POST.get("nome"),
-                2 : request.POST.get("cpf"),
-                3 : request.POST.get("crn"),
-                4 : request.POST.get("data_nascimento"),
-                5 : request.POST.get("sexo"),
-                6 : request.POST.get("telefone"),
-                7 : request.POST.get("email"),
-            }
-            return render(request, "cadastro_nutricionista.html", {"dados_nutri": dados_nutri})
-        return redirect(request, "cadastro_nutricionista")
+        return redirect("nutricionista")
         
 
 @usuario_logado
@@ -107,6 +97,6 @@ def excluir_nutricionista(request):
         return redirect("nutricionista") #Retorno para a consulta de nutricionista
     except Exception as e:
         messages.error(
-            request, f"Erro ao tentar cadastrar: {str(e)}"
+            request, f"Erro ao tentar excluir: {str(e)}"
         )  # CASO DÊ ERRO NA CONEXÃO COM O BANCO
         return redirect("nutricionista")
