@@ -46,9 +46,29 @@ def inclusao_paciente(request):
             cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio))
             conn.commit()
             cursor.close()
-            messages.success(request, "Paciente cadastrado com sucesso!")
             return redirect("paciente")
     except Exception as e:
         messages.error(request, f"Erro ao cadastrar paciente: {str(e)}")
         print(e)
         return redirect("cadastro_paciente")
+
+def exclusao_paciente(request):
+    
+    id = request.POST.get('id', None) #Se estiver chegando pelo post o 'id', atribuir a variavel 'id', caso não venha, atribuir como None/Nulo
+    try:
+        if id: #Verifica se o id não está nulo
+            conn = conectar_banco() 
+            cursor = conn.cursor()
+
+            query = sql.SQL("DELETE FROM Paciente WHERE id_paciente = %s") #Script de exclusão
+            cursor.execute(query, (id,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            messages.success(request, f"Excluído com sucesso!")
+        return redirect("paciente") #Retorno para a consulta de nutricionista
+    except Exception as e:
+        messages.error(
+            request, f"Erro ao tentar excluir: {str(e)}"
+        )  # CASO DÊ ERRO NA CONEXÃO COM O BANCO
+        return redirect("paciente")

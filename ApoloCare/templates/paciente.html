@@ -14,7 +14,11 @@
             <img src="{% static 'images/incluir.png' %}" alt="Novo" class="ml-2 w-5">
         </a>
     </div>
-
+    {% if messages %}
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+    {% endif %}
     <table class="min-w-full bg-white rounded shadow">
         <thead class="bg-yellow-300 text-black">
             <tr class="text-center">
@@ -34,15 +38,17 @@
                     <!-- Formulário para edição -->
                     <form action="{% url 'cadastro_paciente' %}" method="post">
                         {% csrf_token %}
+                        <input type="hidden" name="id" value="{{paciente.0}}">
                         <button type="submit" class="bg-transparent">
                             <img src="{% static 'images/edit_icon.png' %}" alt="Editar" class="w-5">
                         </button>
                     </form>
 
                     <!-- Formulário para exclusão -->
-                    <form action="" method="post"
+                    <form action="{% url 'excluir_paciente' %}" method="post"
                         onsubmit="return confirm('Tem certeza que deseja excluir o paciente: {{ paciente.1 }}?')">
                         {% csrf_token %}
+                        <input type="hidden" name="id" value="{{paciente.0}}">
                         <button type="submit" class="bg-transparent">
                             <img src="{% static 'images/delete_icon.png' %}" alt="Excluir" class="w-5">
                         </button>
