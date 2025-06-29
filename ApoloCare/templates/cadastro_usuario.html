@@ -55,6 +55,7 @@
         <option value="A">Administrador</option>
         <option value="P">Paciente</option>
         <option value="N">Nutricionista</option>
+        <option value="F">Funcionários</option>
       </select>
     </div>
 
@@ -72,9 +73,12 @@
 
     <!-- Ativo -->
     <div class="mb-4 flex items-center">
-      <input type="checkbox" name="ativo" id="ativo" class="mr-2" {% if dados_user %}{% if dados_user == 'true' %} checked {% elif dados_user == 'false' %} {% else %} checked {% endif %} {% endif %}>
-      <label for="ativo" class="font-semibold">Usuário ativo</label>
-    </div>
+  <input type="checkbox" name="ativo" id="ativo" class="mr-2"
+         {% if not dados_user or dados_user|lower != 'false' %}checked disabled {% endif %}>
+  <label for="ativo" class="font-semibold">Usuário ativo</label>
+</div>
+
+
 
     <!-- Botões -->
     <div class="flex justify-between mt-6">

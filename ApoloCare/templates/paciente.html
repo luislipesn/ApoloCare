@@ -17,8 +17,8 @@
 
     <table class="min-w-full bg-white rounded shadow">
         <thead class="bg-yellow-300 text-black">
-            <tr>
-                <th class="py-2 px-4">ID</th>
+            <tr class="text-center">
+                <th class="py-2 px-4">Código</th>
                 <th class="py-2 px-4">Nome</th>
                 <th class="py-2 px-4">CPF</th>
                 <th class="py-2 px-4">Ações</th>
@@ -27,24 +27,24 @@
         <tbody>
             {% for paciente in pacientes %}
             <tr class="border-t">
-                <td class="py-2 px-4">{{ paciente.0 }}</td>
-                <td class="py-2 px-4">{{ paciente.1 }}</td>
-                <td class="py-2 px-4">{{ paciente.3 }}</td>
-                <td class="py-2 px-4 flex gap-2">
+                <td class="py-2 px-4 text-center">{{ paciente.0 }}</td>
+                <td class="py-2 px-4 ">{{ paciente.1 }}</td>
+                <td class="py-2 px-4 text-center" id="cpf">{{ paciente.2 }}</td>
+                <td class="py-2 px-4 flex gap-2 justify-center">
                     <!-- Formulário para edição -->
-                    <form action="{% url 'cadastro_paciente' paciente.0 %}" method="post">
+                    <form action="{% url 'cadastro_paciente' %}" method="post">
                         {% csrf_token %}
                         <button type="submit" class="bg-transparent">
-                            <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" class="w-5">
+                            <img src="{% static 'images/edit_icon.png' %}" alt="Editar" class="w-5">
                         </button>
                     </form>
 
                     <!-- Formulário para exclusão -->
-                    <form action="{% url 'deletar_paciente' paciente.0 %}" method="post"
-                        onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                    <form action="" method="post"
+                        onsubmit="return confirm('Tem certeza que deseja excluir o paciente: {{ paciente.1 }}?')">
                         {% csrf_token %}
                         <button type="submit" class="bg-transparent">
-                            <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" class="w-5">
+                            <img src="{% static 'images/delete_icon.png' %}" alt="Excluir" class="w-5">
                         </button>
                     </form>
                 </td>
@@ -64,4 +64,9 @@
             Voltar
         </a>
     </div>
+
+    <script>
+        const cpf = document.getElementById("cpf").innerText;
+        document.getElementById("cpf").innerText = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    </script>
     {% endblock %}

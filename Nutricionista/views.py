@@ -23,12 +23,13 @@ def nutricionista(request):
 
 
 @usuario_logado
-def cadastro_nutricionista(request, id=None):
+def cadastro_nutricionista(request):
+    id = request.POST.get('id', None)
     if id:
         conn = conectar_banco()
         cursor = conn.cursor()
 
-        query = sql.SQL("SELECT id_nutricionista, nome, cpf, crn, dt_nasc, sexo, telefone, email FROM nutricionista WHERE id_nutricionista = '%s'")
+        query = sql.SQL("SELECT id_nutricionista, nome, cpf, crn, dt_nasc, sexo, telefone, email FROM nutricionista WHERE id_nutricionista = %s")
         cursor.execute(query, (id,))
         resultado = cursor.fetchone()
         cursor.close()
@@ -59,10 +60,10 @@ def inclusao_nutricionista(request):
 
             if id: #Caso tenha um ID, ele será um update
                 query = sql.SQL(
-                    "UPDATE Nutricionista SET nome=%s, cpf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s WHERE id_nutricionista=%s"
+                    "UPDATE Nutricionista SET nome=%s, cf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s WHERE id_nutricionista=%s"
                 )
-                messages.error(request, f"Alterado com sucesso!")
                 cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id))
+                messages.error(request, f"Alterado com sucesso!")
             else: #Caso não, ele será um insert
                 query = sql.SQL(
                     "INSERT INTO Nutricionista(nome, cpf, crn, dt_nasc, sexo, telefone, email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
@@ -74,10 +75,19 @@ def inclusao_nutricionista(request):
         return redirect("nutricionista")
     except Exception as e:
         messages.error(request, f"{str(e)}")
-        id_nutricionista = request.POST.get("id_nutricionista")
-        if id_nutricionista:
-            return redirect(f"/cadastro_nutricionista/{id_nutricionista}/")
-        return redirect("cadastro_nutricionista")
+        if id:
+            dados_nutri = {
+                0 : request.POST.get("id_nutricionista"),
+                1 : request.POST.get("nome"),
+                2 : request.POST.get("cpf"),
+                3 : request.POST.get("crn"),
+                4 : request.POST.get("data_nascimento"),
+                5 : request.POST.get("sexo"),
+                6 : request.POST.get("telefone"),
+                7 : request.POST.get("email"),
+            }
+            return render(request, "cadastro_nutricionista.html", {"dados_nutri": dados_nutri})
+        return redirect(request, "cadastro_nutricionista")
         
 
 @usuario_logado
