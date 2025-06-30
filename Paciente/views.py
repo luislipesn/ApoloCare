@@ -29,7 +29,7 @@ def cadastro_paciente(request):
 def inclusao_paciente(request):
     try:
         if request.method == "POST":
-    
+            
             nome = request.POST["nome"]
             cpf = re.sub(r"\D", "", request.POST["cpf"])
             dt_nasc = request.POST["dt_nasc"]
@@ -42,16 +42,20 @@ def inclusao_paciente(request):
             conn = conectar_banco()
             cursor = conn.cursor()
 
-            query = sql.SQL("INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
-            cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio))
+            id = request.POST.get('id_nutricionista', None)
+            if id:
+                print("")
+            else:
+                query = sql.SQL("INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
+                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio))
             conn.commit()
             cursor.close()
             return redirect("paciente")
     except Exception as e:
         messages.error(request, f"Erro ao cadastrar paciente: {str(e)}")
-        print(e)
         return redirect("cadastro_paciente")
 
+@usuario_logado
 def exclusao_paciente(request):
     
     id = request.POST.get('id', None) #Se estiver chegando pelo post o 'id', atribuir a variavel 'id', caso não venha, atribuir como None/Nulo
