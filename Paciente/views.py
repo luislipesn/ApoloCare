@@ -42,9 +42,11 @@ def inclusao_paciente(request):
             conn = conectar_banco()
             cursor = conn.cursor()
 
-            id = request.POST.get('id_nutricionista', None)
+            id = request.POST.get('id', None)
             if id:
-                print("")
+                query = sql.SQL("UPDATE Paciente SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s WHERE id_paciente = %s;")
+                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id))
+                messages.success(request, f"Alterado com sucesso!")
             else:
                 query = sql.SQL("INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
                 cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio))
