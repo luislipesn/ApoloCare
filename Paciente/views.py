@@ -23,6 +23,23 @@ def paciente(request):
 
 @usuario_logado
 def cadastro_paciente(request):
+
+    id = request.POST.get('id', None)
+    if id:
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        query = sql.SQL("SELECT id_paciente, nome, cpf, dt_nasc, endereco, sexo, telefone, email, convenio FROM Paciente WHERE id_paciente = %s")
+        cursor.execute(query, (id,))
+        resultado = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        contexto = {
+            'dados_paciente' : resultado
+        }
+        print(resultado)
+        return render(request, "cadastro_paciente.html", contexto)
+    
     return render(request, "cadastro_paciente.html")
 
 @usuario_logado
@@ -42,7 +59,7 @@ def inclusao_paciente(request):
             conn = conectar_banco()
             cursor = conn.cursor()
 
-            id = request.POST.get('id', None)
+            id = request.POST.get('id_paciente', None)
             if id:
                 query = sql.SQL("UPDATE Paciente SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s WHERE id_paciente = %s;")
                 cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id))

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consultas{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-cyan-300 to-blue-700 p-6 text-black">
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Consultas</h1>
+        <a href="{% url 'cadastro_consulta' %}"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-2 rounded-full flex items-center">
+            Nova Consulta
+            <img src="{% static 'images/incluir.png' %}" alt="Nova" class="ml-2 w-5">
+        </a>
+    </div>
+
+    <table class="min-w-full bg-white rounded shadow text-center">
+        <thead class="bg-yellow-300 text-black">
+            <tr>
+                <th class="py-2 px-4">ID</th>
+                <th class="py-2 px-4">Paciente</th>
+                <th class="py-2 px-4">Nutricionista</th>
+                <th class="py-2 px-4">Data</th>
+                <th class="py-2 px-4">Hora</th>
+                <th class="py-2 px-4">Peso (kg)</th>
+                <th class="py-2 px-4">Altura (m)</th>
+                <th class="py-2 px-4">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for consulta in consultas %}
+            <tr class="border-t">
+                <td class="py-2 px-4">{{ consulta.0 }}</td>
+                <td class="py-2 px-4">{{ consulta.1 }}</td> {# Nome do Paciente #}
+                <td class="py-2 px-4">{{ consulta.2 }}</td> {# Nome do Nutricionista #}
+                <td class="py-2 px-4">{{ consulta.3|date:"d/m/Y" }}</td>
+                <td class="py-2 px-4">{{ consulta.4|time:"H:i" }}</td>
+                <td class="py-2 px-4">{{ consulta.5 }}</td>
+                <td class="py-2 px-4">{{ consulta.6 }}</td>
+                <td class="py-2 px-4 flex justify-center gap-2">
+                <td class="py-2 px-4 flex justify-center gap-2">
+                    <!-- Botão de editar -->
+                    <form method="post" action="{% url 'cadastro_consulta_id' consulta.0 %}">
+                        {% csrf_token %}
+                        <button type="submit">
+                            <img src="{% static 'icons/edit_icon.png' %}" alt="Editar" class="w-5">
+                        </button>
+                    </form>
+
+                    <!-- Botão de deletar -->
+                    <form method="post" action="{% url 'deletar_consulta' consulta.0 %}"
+                        onsubmit="return confirm('Deseja excluir a consulta do paciente: {{ consulta.1 }}, das {{ consulta.3 }} do horário {{ consulta.4 }} ?')">
+                        {% csrf_token %}
+                        <button type="submit">
+                            <img src="{% static 'icons/delete_icon.png' %}" alt="Excluir" class="w-5">
+                        </button>
+                    </form>
+                </td>
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-4">Nenhuma consulta registrada.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

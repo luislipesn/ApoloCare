@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "Nutricionista",
     "Paciente",
     "Usuario",
+    "Consulta",
 ]
 
 MIDDLEWARE = [
