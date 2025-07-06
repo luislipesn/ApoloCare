@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliações de Atendimento{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-green-100 to-green-400 p-6 text-black">
+  <h1 class="text-2xl font-bold text-center mb-6">Avaliações de Atendimento</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="text-center text-red-600 font-semibold">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <table class="min-w-full bg-white rounded shadow">
+    <thead class="bg-green-600 text-white">
+      <tr>
+        <th class="py-2 px-4 text-center">Consulta</th>
+        <th class="py-2 px-4 text-center">Data</th>
+        <th class="py-2 px-4 text-center">Hora</th>
+        <th class="py-2 px-4 text-center">Nutricionista</th>
+        <th class="py-2 px-4 text-center">Nota</th>
+        <th class="py-2 px-4 text-center">Comentário</th>
+        <th class="py-2 px-4 text-center">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for avaliacao in avaliacoes %}
+      <tr class="border-t text-center">
+        <td class="py-2 px-4">{{ avaliacao.id_consulta }}</td>
+        <td class="py-2 px-4">{{ avaliacao.dt_consulta|date:"d/m/Y" }}</td>
+        <td class="py-2 px-4">{{ avaliacao.hr_consulta|time:"H:i" }}</td>
+        <td class="py-2 px-4">{{ avaliacao.nome_nutricionista }}</td>
+        <td class="py-2 px-4">{{ avaliacao.nota|default:"-" }}</td>
+        <td class="py-2 px-4">{{ avaliacao.comentario|default:"-" }}</td>
+        <td class="py-2 px-4">
+          {% if not avaliacao.nota %}
+          <form method="POST" action="{% url 'avaliacao_atendimento' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id_consulta" value="{{ avaliacao.id_consulta }}">
+            <button type="submit" class="text-blue-600 hover:text-blue-800 font-semibold">Avaliar</button>
+          </form>
+          {% else %}
+          <span class="text-gray-400 italic">Finalizado</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center py-4 text-gray-500">Nenhuma avaliação registrada.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

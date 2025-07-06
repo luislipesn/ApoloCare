@@ -23,24 +23,27 @@ def paciente(request):
 
 @usuario_logado
 def cadastro_paciente(request):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id_usuario, nome FROM usuario WHERE tipo_usuario = 'P'")
+    usuarios = cursor.fetchall()
+
+    contexto = {"usuarios": usuarios}
 
     id = request.POST.get('id', None)
     if id:
-        conn = conectar_banco()
-        cursor = conn.cursor()
-
-        query = sql.SQL("SELECT id_paciente, nome, cpf, dt_nasc, endereco, sexo, telefone, email, convenio FROM Paciente WHERE id_paciente = %s")
+        query = sql.SQL(
+            "SELECT id_paciente, nome, cpf, dt_nasc, endereco, sexo, telefone, email, convenio, id_usuario FROM Paciente WHERE id_paciente = %s"
+        )
         cursor.execute(query, (id,))
         resultado = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        contexto = {
-            'dados_paciente' : resultado
-        }
-        print(resultado)
-        return render(request, "cadastro_paciente.html", contexto)
-    
-    return render(request, "cadastro_paciente.html")
+        contexto = {"usuarios": usuarios,
+                    "dados_paciente" : resultado}
+    cursor.close()
+    conn.close()
+    return render(request, "cadastro_paciente.html", contexto)
+
 
 @usuario_logado
 def inclusao_paciente(request):
@@ -55,18 +58,28 @@ def inclusao_paciente(request):
             telefone = re.sub(r"\D", "", request.POST["telefone"])
             email = request.POST["email"]
             convenio = request.POST["convenio"]
+            id_usuario = request.POST["id_usuario"]
+
 
             conn = conectar_banco()
             cursor = conn.cursor()
 
             id = request.POST.get('id_paciente', None)
             if id:
-                query = sql.SQL("UPDATE Paciente SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s WHERE id_paciente = %s;")
-                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id))
+                query = sql.SQL("""
+                UPDATE Paciente
+                SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s, id_usuario=%s
+                WHERE id_paciente = %s;
+                """)
+                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario, id))
                 messages.success(request, f"Alterado com sucesso!")
             else:
-                query = sql.SQL("INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)")
-                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio))
+                query = sql.SQL("""
+                INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """)
+                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario))
+
             conn.commit()
             cursor.close()
             return redirect("paciente")

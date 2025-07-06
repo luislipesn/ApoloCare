@@ -79,6 +79,17 @@
       </div>
     </div>
 
+    <div class="flex flex-col mb-4">
+  <label for="id_usuario" class="text-black font-semibold mb-1">Vincular a Usuário:</label>
+  <select name="id_usuario" class="bg-white rounded-full px-4 py-2 border border-gray-300" required>
+    <option value="">Selecione o usuário</option>
+    {% for user in usuarios %}
+      <option value="{{ user.0 }}" {% if dados_paciente and dados_paciente.9 == user.0 %}selected{% endif %}>{{ user.1 }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+
     <!-- Botões -->
     <div class="flex justify-center gap-6">
       <a href="{% url 'paciente' %}" class="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-8 py-2 rounded-full">

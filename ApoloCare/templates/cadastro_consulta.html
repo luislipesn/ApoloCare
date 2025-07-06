@@ -14,23 +14,20 @@
     {% endfor %}
   {% endif %}
 
-  <form method="POST" action="{% url 'inserir_consulta' %}" class="max-w-4xl mx-auto bg-white/30 p-6 rounded-xl shadow-lg">
+  <form method="POST" action="{% url 'incluir_consulta' %}" class="max-w-4xl mx-auto bg-white/30 p-6 rounded-xl shadow-lg">
     {% csrf_token %}
 
     <div class="grid grid-cols-3 gap-4 mb-4">
-      <!-- Data -->
       <div>
         <label for="dt_consulta" class="font-semibold">Data da Consulta:</label>
-        <input type="date" id="dt_consulta" name="dt_consulta" value="{{ dados_consulta.1|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" required>
+        <input type="date" id="dt_consulta" name="dt_consulta" value="{% if dados_consulta and dados_consulta.1 %}{{ dados_consulta.1|date:'Y-m-d' }}{% endif %}" class="w-full rounded-full px-4 py-2" required>
       </div>
 
-      <!-- Hora -->
       <div>
         <label for="hr_consulta" class="font-semibold">Hora:</label>
-        <input type="time" id="hr_consulta" name="hr_consulta" value="{{ dados_consulta.2|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" required>
+        <input type="time" id="hr_consulta" name="hr_consulta" value="{% if dados_consulta and dados_consulta.2 %}{{ dados_consulta.2|time:'H:i' }}{% endif %}" class="w-full rounded-full px-4 py-2" required>
       </div>
 
-      <!-- Bioimpedância -->
       <div>
         <label for="bioimpedancia" class="font-semibold">Bioimpedância:</label>
         <input type="text" id="bioimpedancia" name="bioimpedancia" value="{{ dados_consulta.5|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" maxlength="100">
@@ -38,19 +35,16 @@
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-4">
-      <!-- Altura -->
       <div>
         <label for="altura" class="font-semibold">Altura (m):</label>
-        <input type="number" id="altura" name="altura" step="0.01" value="{{ dados_consulta.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
+        <input type="text" id="altura" name="altura" value="{{ dados_consulta.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
       </div>
 
-      <!-- Peso -->
       <div>
         <label for="peso" class="font-semibold">Peso (kg):</label>
-        <input type="number" id="peso" name="peso" step="0.001" value="{{ dados_consulta.4|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
+        <input type="text" id="peso" name="peso" value="{{ dados_consulta.4|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
       </div>
 
-      <!-- Código (somente leitura, se estiver editando) -->
       {% if dados_consulta %}
       <div>
         <label class="font-semibold">Código da Consulta:</label>
@@ -59,14 +53,12 @@
       {% endif %}
     </div>
 
-    <!-- Observações -->
     <div class="mb-4">
       <label for="observacoes" class="font-semibold">Observações:</label>
       <textarea name="observacoes" id="observacoes" rows="3" maxlength="255" class="w-full rounded-lg px-4 py-2">{{ dados_consulta.6|default_if_none:'' }}</textarea>
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-6">
-      <!-- Seleção de Paciente -->
       <div>
         <label for="id_paciente" class="font-semibold">Paciente:</label>
         <select name="id_paciente" id="id_paciente" class="w-full rounded-full px-4 py-2 border border-gray-300" required>
@@ -77,38 +69,32 @@
         </select>
       </div>
 
-      <!-- Seleção de Nutricionista -->
       <div>
         <label for="id_nutricionista" class="font-semibold">Nutricionista:</label>
         <select name="id_nutricionista" id="id_nutricionista" class="w-full rounded-full px-4 py-2 border border-gray-300" required>
-          <option value="">Selecione</option>
+          <option value="" disabled selected>Selecione</option>
           {% for nutri in nutricionistas %}
             <option value="{{ nutri.0 }}" {% if dados_consulta.8 == nutri.0 %}selected{% endif %}>{{ nutri.1 }}</option>
           {% endfor %}
         </select>
       </div>
-
-      <!-- Seleção de Usuário -->
-      <div>
-        <label for="id_usuario" class="font-semibold">Usuário:</label>
-        <select name="id_usuario" id="id_usuario" class="w-full rounded-full px-4 py-2 border border-gray-300" required>
-          <option value="">Selecione</option>
-          {% for usuario in usuarios %}
-            <option value="{{ usuario.0 }}" {% if dados_consulta.9 == usuario.0 %}selected{% endif %}>{{ usuario.1 }}</option>
-          {% endfor %}
-        </select>
-      </div>
     </div>
 
-    <!-- Botões -->
-    <div class="flex justify-center gap-6">
-      <a href="{% url 'consultas' %}" class="bg-red-700 hover:bg-red-800 text-white font-semibold px-8 py-2 rounded-full">
+    <div class="flex justify-end space-x-4">
+      <a href="{% url 'consulta' %}" class="bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2 rounded-md">
         Cancelar
       </a>
-      <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-semibold px-8 py-2 rounded-full">
+      <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-semibold px-4 py-2 rounded-md">
         Salvar
       </button>
     </div>
   </form>
 </div>
+
+<script src="https://unpkg.com/imask"></script>
+<script>
+  IMask(document.getElementById('altura'), {
+    mask: '0.00'
+  });
+</script>
 {% endblock %}

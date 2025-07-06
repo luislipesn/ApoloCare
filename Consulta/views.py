@@ -1,33 +1,159 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from psycopg2 import sql
+from django.contrib import messages
+from Avaliacao.views import exclusao_avaliacao, inserir_avaliacao
 from ApoloCare.decorators import usuario_logado
 from ApoloCare.database import conectar_banco
 
 @usuario_logado
-def cadastro_consulta(request):
-    
-    return (request, "cadastro_consulta.html")
+def consulta(request):
+    consultas = []  # Valor padrão vazio
+
+    try:
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        if request.session['tipo_usuario'] == "N":
+            id_nutricionista = request.session.get("id_usuario")
+            query = sql.SQL("""
+                SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
+                       c.dt_consulta, c.hr_consulta, c.peso, c.altura 
+                FROM Consulta c 
+                JOIN Paciente p ON c.id_paciente = p.id_paciente  
+                JOIN Nutricionista n ON c.id_nutricionista = n.id_nutricionista 
+                WHERE n.id_nutricionista = %s
+            """)
+            cursor.execute(query, (id_nutricionista,))
+        else:
+            query = sql.SQL("""
+                SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
+                       c.dt_consulta, c.hr_consulta, c.peso, c.altura 
+                FROM Consulta c 
+                JOIN Paciente p ON c.id_paciente = p.id_paciente  
+                JOIN Nutricionista n ON c.id_nutricionista = n.id_nutricionista
+            """)
+            cursor.execute(query)
+
+        consultas = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        messages.error(request, f"Erro ao buscar consultas: {str(e)}")
+        # Ignora o erro e segue com consultas vazio
+
+    return render(request, "consulta.html", {'consultas': consultas})
 
 @usuario_logado
-def consulta(request):
-    
-    conn = conectar_banco() #Conexão com o banco de dados
+def cadastro_consulta(request):
+    conn = conectar_banco()
     cursor = conn.cursor()
 
-    if request.session['tipo_usuario'] == "N":
-        query = sql.SQL("SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, c.dt_consulta, c.hr_consulta, c.peso, c.altura FROM Consulta c, Paciente p, Nutricionista n WHERE c.id_paciente = p.id_paciente  AND c.id_nutricionista = n.id_nutricionista AND n.id_nutricionista = %s")
-        cursor.execute(query, (id,))
-    else:
-        query = sql.SQL("SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, c.dt_consulta, c.hr_consulta, c.peso, c.altura FROM Consulta c, Paciente p, Nutricionista n WHERE c.id_paciente = p.id_paciente  AND c.id_nutricionista = n.id_nutricionista")
-    
-    consultas = cursor.fetchall()
+    # Buscar dados da consulta, se for edição
+    dados_consulta = None
 
-    conn.close()
+    id = request.POST.get("id", None)
+    if id:
+        cursor.execute("SELECT * FROM consulta WHERE id_consulta = %s", [id])
+        dados_consulta = cursor.fetchone()
+
+    # Carregar dados auxiliares para selects
+    cursor.execute("SELECT id_paciente, nome FROM paciente")
+    pacientes = cursor.fetchall()
+
+    cursor.execute("SELECT id_nutricionista, nome FROM nutricionista")
+    nutricionistas = cursor.fetchall()
+
     cursor.close()
-
+    
     contexto = {
-        'consultas' : consultas
+        'dados_consulta': dados_consulta,
+        'pacientes': pacientes,
+        'nutricionistas': nutricionistas,
     }
+
+    return render(request, "cadastro_consulta.html", contexto)
+
+def deletar_consulta(request):
+    if request.session["tipo_usuario"] == 'A':
+        
+        try:
+
+            id_consulta = request.POST['id']
+            exclusao_avaliacao(request, id_consulta)
+        
+            conn = conectar_banco()
+            cursor = conn.cursor()
+
+            query = sql.SQL("DELETE FROM Consulta WHERE id_consulta = %s")
+            cursor.execute(query,(id_consulta,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+        
+        except Exception as e:
+            messages.error(request, f"{str(e)}")
+            return redirect(request, "consulta")
+    messages.error(request, f"Você não tem permissão para excluir!")
+    return redirect(request, "consulta")
+
+def incluir_consulta(request):
+    if request.method == "POST":
+        id_consulta = request.POST.get("id_consulta", None)
+        dt_consulta = request.POST.get("dt_consulta")
+        hr_consulta = request.POST.get("hr_consulta")
+        
+        altura = float(request.POST.get("altura").replace(",", "."))
+        peso = float(request.POST.get("peso").replace(",", "."))
+        bioimpedancia = request.POST.get("bioimpedancia")
+        observacoes = request.POST.get("observacoes")
+        id_paciente = request.POST.get("id_paciente")
+        id_nutricionista = request.POST.get("id_nutricionista")
+        id_usuario = request.session["id_usuario"]
+
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        try:
+            if id_consulta:
+                # Atualizar
+                cursor.execute("""
+                    UPDATE consulta SET
+                        dt_consulta = %s,
+                        hr_consulta = %s,
+                        altura = %s,
+                        peso = %s,
+                        bioimpedancia = %s,
+                        observacoes = %s,
+                        id_paciente = %s,
+                        id_nutricionista = %s,
+                        id_usuario = %s
+                    WHERE id_consulta = %s
+                """, [dt_consulta, hr_consulta, altura, peso, bioimpedancia, observacoes, id_paciente, id_nutricionista, id_usuario, id_consulta])
+                conn.commit()
+            else:
+                # Inserir nova
+                cursor.execute("""
+                    INSERT INTO consulta (
+                        dt_consulta, hr_consulta, altura, peso,
+                        bioimpedancia, observacoes, id_paciente,
+                        id_nutricionista, id_usuario
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, [dt_consulta, hr_consulta, altura, peso, bioimpedancia, observacoes, id_paciente, id_nutricionista, id_usuario])
+                conn.commit()
+                inserir_avaliacao()
+
+            
+            messages.success(request, "Consulta salva com sucesso.")
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            conn.rollback()
+            messages.error(request, f"Erro ao salvar consulta: {str(e)}")
+        
+        
+        return redirect("consulta")  # Ajuste para o nome real da URL de listagem
+
     
-    
-    return render(request, "consulta.html", contexto)
+

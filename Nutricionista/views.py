@@ -26,21 +26,30 @@ def nutricionista(request):
 @usuario_logado
 def cadastro_nutricionista(request):
     id = request.POST.get('id', None)
-    if id:
-        conn = conectar_banco()
-        cursor = conn.cursor()
 
-        query = sql.SQL("SELECT id_nutricionista, nome, cpf, crn, dt_nasc, sexo, telefone, email FROM nutricionista WHERE id_nutricionista = %s")
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    # Buscar usuários para o select
+    cursor.execute("SELECT id_usuario, nome FROM usuario WHERE tipo_usuario = 'N'")
+    usuarios = cursor.fetchall()
+
+    if id:
+        query = sql.SQL("SELECT id_nutricionista, nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario FROM nutricionista WHERE id_nutricionista = %s")
         cursor.execute(query, (id,))
         resultado = cursor.fetchone()
-        cursor.close()
-        conn.close()
         contexto = {
-            'dados_nutri' : resultado
+            'dados_nutri': resultado,
+            'usuarios': usuarios
         }
-        return render(request, "cadastro_nutricionista.html", contexto)
+    else:
+        contexto = {
+            'usuarios': usuarios
+        }
 
-    return render(request, "cadastro_nutricionista.html")
+    cursor.close()
+    conn.close()
+    return render(request, "cadastro_nutricionista.html", contexto)
 
 
 @usuario_logado
@@ -54,6 +63,7 @@ def inclusao_nutricionista(request):
             telefone = re.sub(r"\D", "", request.POST["telefone"])
             sexo = request.POST["sexo"]
             email = request.POST["email"]
+            id_usuario = request.POST["id_usuario"]
 
             conn = conectar_banco() #Conexão com o banco de dados
             cursor = conn.cursor()
@@ -61,15 +71,15 @@ def inclusao_nutricionista(request):
 
             if id: #Caso tenha um ID, ele será um update
                 query = sql.SQL(
-                    "UPDATE Nutricionista SET nome=%s, cf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s WHERE id_nutricionista=%s"
+                    "UPDATE Nutricionista SET nome=%s, cpf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s, id_usuario=%s WHERE id_nutricionista=%s"
                 )
-                cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id))
+                cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario, id))
                 messages.error(request, f"Alterado com sucesso!")
             else: #Caso não, ele será um insert
                 query = sql.SQL(
-                    "INSERT INTO Nutricionista(nome, cpf, crn, dt_nasc, sexo, telefone, email) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    "INSERT INTO Nutricionista (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
                 )
-                cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email))
+                cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario))
             conn.commit()
             cursor.close()
             conn.close()

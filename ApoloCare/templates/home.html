@@ -29,10 +29,20 @@
                 <p class="font-semibold">Nutricionista</p>
             </div>
             </a>
+            <a href="{% url 'consulta' %}">
             <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
                 <img src="{% static 'images/consulta.png' %}" alt="Consultas" class="mx-auto h-24 mb-2" />
                 <p class="font-semibold">Consultas</p>
             </div>
+            </a>
+            {% if request.session.tipo_usuario == "A" %}
+            <a href="{% url 'avaliacao' %}">
+            <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
+                <p class="font-semibold">Avaliar Consulta</p>
+            </div>
+            </a>  
+            {% endif %}
         </div>
 
         <!-- Agenda do Dia -->
@@ -68,7 +78,7 @@
         {% else %}
         <div class="flex justify-center gap-10 mb-10">
             
-            <a href="{% url 'nutricionista' %}">
+            <a href="{% url 'avaliacao' %}">
             <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
                 <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
                 <p class="font-semibold">Avaliar Consulta</p>

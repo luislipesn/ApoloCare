@@ -75,7 +75,7 @@ def inclusao_usuario(request):
             endereco = request.POST["endereco"]
             login = request.POST["login"].lower()
             senha = make_password(request.POST["senha"])
-            ativo = bool(request.POST["ativo"])
+            ativo = True
 
             #print(ativo)
 
@@ -102,6 +102,8 @@ def inclusao_usuario(request):
             conn.commit()
             cursor.close()
             conn.close()
+        if request.session['id_usuario']:
+             return redirect("home")   
         return redirect("login")
     except Exception as e:
         messages.error(
