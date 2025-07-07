@@ -2,11 +2,13 @@
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>Bem vindo ao ApoloCare!</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gradient-to-r from-cyan-400 to-blue-700 min-h-screen text-black">
 
     {% include 'include/navbar.html' %}
@@ -15,33 +17,33 @@
     <div class="container mx-auto py-10">
 
         <!-- Botões -->
-         {% if request.session.tipo_usuario != "P" %}
+        {% if request.session.tipo_usuario != "P" %}
         <div class="flex justify-center gap-10 mb-10">
             <a href="{% url 'paciente' %}">
-            <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
-                <img src="{% static 'images/paciente.png' %}" alt="Paciente" class="mx-auto h-24 mb-2" />
-                <p class="font-semibold">Paciente</p>
-            </div>
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/paciente.png' %}" alt="Paciente" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Paciente</p>
+                </div>
             </a>
             <a href="{% url 'nutricionista' %}">
-            <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
-                <img src="{% static 'images/nutri.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
-                <p class="font-semibold">Nutricionista</p>
-            </div>
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/nutri.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Nutricionista</p>
+                </div>
             </a>
             <a href="{% url 'consulta' %}">
-            <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
-                <img src="{% static 'images/consulta.png' %}" alt="Consultas" class="mx-auto h-24 mb-2" />
-                <p class="font-semibold">Consultas</p>
-            </div>
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/consulta.png' %}" alt="Consultas" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Consultas</p>
+                </div>
             </a>
             {% if request.session.tipo_usuario == "A" %}
             <a href="{% url 'avaliacao' %}">
-            <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
-                <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
-                <p class="font-semibold">Avaliar Consulta</p>
-            </div>
-            </a>  
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Avaliar Consulta</p>
+                </div>
+            </a>
             {% endif %}
         </div>
 
@@ -56,36 +58,35 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="border-t">
-                        <td class="px-4 py-2">15/05/2025 - 07:30</td>
-                        <td class="px-4 py-2 italic">Ricardo Freitas</td>
+                    {% for consulta in consultas %}
+                    <tr class="{% cycle 'border-t' 'bg-gray-100 border-t' %}">
+                        <td class="px-4 py-2">
+                            {{ consulta.0|date:"d/m/Y" }} - {{ consulta.1|time:"H:i" }}
+                        </td>
+                        <td class="px-4 py-2 italic">{{ consulta.2 }}</td>
                     </tr>
-                    <tr class="bg-gray-100 border-t">
-                        <td class="px-4 py-2">15/05/2025 - 08:00</td>
-                        <td class="px-4 py-2 italic">Inês Brasil</td>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center py-4 text-gray-500">Nenhuma consulta agendada para hoje.</td>
                     </tr>
-                    <tr class="border-t">
-                        <td class="px-4 py-2">15/05/2025 - 08:30</td>
-                        <td class="px-4 py-2 italic">Aghata Nunes</td>
-                    </tr>
-                    <tr class="bg-gray-100 border-t">
-                        <td class="px-4 py-2">15/05/2025 - 09:00</td>
-                        <td class="px-4 py-2 italic">Ygona Moura</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-        <div class="flex justify-center gap-10 mb-10">
-            
-            <a href="{% url 'avaliacao' %}">
+
+    </div>
+    {% else %}
+    <div class="flex justify-center gap-10 mb-10">
+
+        <a href="{% url 'avaliacao' %}">
             <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
                 <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
                 <p class="font-semibold">Avaliar Consulta</p>
             </div>
-            </a>  
-        </div>
-        {% endif %}
+        </a>
+    </div>
+    {% endif %}
     </div>
 </body>
+
 </html>

@@ -4,7 +4,7 @@
 {% block title %}Avaliações de Atendimento{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-r from-green-100 to-green-400 p-6 text-black">
+<div class="min-h-screen bg-gradient-to-r from-cyan-400 to-blue-800 p-6 text-black">
   <h1 class="text-2xl font-bold text-center mb-6">Avaliações de Atendimento</h1>
 
   {% if messages %}
@@ -13,21 +13,21 @@
     {% endfor %}
   {% endif %}
 
-  <table class="min-w-full bg-white rounded shadow">
-    <thead class="bg-green-600 text-white">
+  <table class="min-w-full bg-white rounded-xl shadow-lg overflow-hidden">
+    <thead class="bg-yellow-300 text-black text-center">
       <tr>
-        <th class="py-2 px-4 text-center">Consulta</th>
-        <th class="py-2 px-4 text-center">Data</th>
-        <th class="py-2 px-4 text-center">Hora</th>
-        <th class="py-2 px-4 text-center">Nutricionista</th>
-        <th class="py-2 px-4 text-center">Nota</th>
-        <th class="py-2 px-4 text-center">Comentário</th>
-        <th class="py-2 px-4 text-center">Ações</th>
+        <th class="py-2 px-4">Consulta</th>
+        <th class="py-2 px-4">Data</th>
+        <th class="py-2 px-4">Hora</th>
+        <th class="py-2 px-4">Nutricionista</th>
+        <th class="py-2 px-4">Nota</th>
+        <th class="py-2 px-4">Comentário</th>
+        <th class="py-2 px-4">Ações</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="text-center">
       {% for avaliacao in avaliacoes %}
-      <tr class="border-t text-center">
+      <tr class="border-t hover:bg-gray-100 transition">
         <td class="py-2 px-4">{{ avaliacao.id_consulta }}</td>
         <td class="py-2 px-4">{{ avaliacao.dt_consulta|date:"d/m/Y" }}</td>
         <td class="py-2 px-4">{{ avaliacao.hr_consulta|time:"H:i" }}</td>
@@ -38,8 +38,10 @@
           {% if not avaliacao.nota %}
           <form method="POST" action="{% url 'avaliacao_atendimento' %}">
             {% csrf_token %}
-            <input type="hidden" name="id_consulta" value="{{ avaliacao.id_consulta }}">
-            <button type="submit" class="text-blue-600 hover:text-blue-800 font-semibold">Avaliar</button>
+            <input type="hidden" name="id_avaliacao" value="{{ avaliacao.id_avaliacao }}">
+            <button type="submit" class="bg-indigo-800 hover:bg-indigo-900 text-white text-sm font-semibold px-4 py-1 rounded-full">
+              Avaliar
+            </button>
           </form>
           {% else %}
           <span class="text-gray-400 italic">Finalizado</span>
@@ -48,10 +50,16 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="7" class="text-center py-4 text-gray-500">Nenhuma avaliação registrada.</td>
+        <td colspan="7" class="text-center py-4 text-gray-200">Nenhuma avaliação registrada.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+
+  <div class="mt-6 text-center">
+    <a href="{% url 'home' %}" class="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-6 py-2 rounded-full">
+      Voltar ao Início
+    </a>
+  </div>
 </div>
 {% endblock %}

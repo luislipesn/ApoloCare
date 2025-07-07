@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render
+from psycopg2 import sql
 from .database import conectar_banco
 from .decorators import usuario_logado
 
@@ -12,5 +12,11 @@ def home(request):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    query = sql.SQL("SELECT c.dt_consulta, c.hr_consulta, p.nome FROM Consulta p, Paciente p WHERE dt_consulta > CURRENT_DATE")
-    return render(request, "home.html", {"user": request.user})
+    query = sql.SQL("SELECT c.dt_consulta, c.hr_consulta, p.nome FROM Consulta c, Paciente p WHERE c.id_paciente = p.id_paciente and dt_consulta >= CURRENT_DATE ORDER BY c.dt_consulta, c.hr_consulta")
+    cursor.execute(query)
+    resultado = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render(request, "home.html", {"consultas": resultado})

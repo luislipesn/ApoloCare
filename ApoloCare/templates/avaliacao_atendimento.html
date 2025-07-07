@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Avaliação de Atendimento{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-cyan-400 to-blue-800 p-6 text-black">
+  <h1 class="text-center text-2xl font-bold text-black mb-6">Avaliação de Atendimento</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <p class="text-center text-red-700 font-semibold">{{ message }}</p>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" action="{% url 'avaliar' %}" class="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
+    {% csrf_token %}
+
+    <!-- ID da Avaliação -->
+    {% if dados_avaliacao %}
+    <input type="hidden" name="id_avaliacao_atendimento" value="{{ dados_avaliacao.0 }}">
+    {% endif %}
+    <input type="hidden" name="id_consulta" value="{{ dados_avaliacao.5 }}">
+
+    <!-- Data e Hora da Avaliação -->
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="font-semibold">Data:</label>
+        <input type="date" name="dt_avaliacao" value="{{ dados_avaliacao.1|date:'Y-m-d' }}" class="w-full rounded-full px-4 py-2 border" required readonly>
+      </div>
+      <div>
+        <label class="font-semibold">Hora:</label>
+        <input type="time" name="hr_avaliacao" value="{{ dados_avaliacao.2|time:'H:i' }}" class="w-full rounded-full px-4 py-2 border" required readonly>
+      </div>
+    </div>
+
+    <!-- Nota -->
+    <div class="mb-4">
+      <label class="font-semibold">Nota (1 a 5):</label>
+      {% if dados_avaliacao and dados_avaliacao.3 %}
+        <input type="text" name="nota" value="{{ dados_avaliacao.3 }}" readonly class="w-full rounded-full px-4 py-2 border bg-gray-200">
+      {% else %}
+        <select name="nota" class="w-full rounded-full px-4 py-2 border" required>
+          <option value="" disabled selected>Selecione</option>
+          {% for i in "12345" %}
+            <option value="{{ i }}" {% if dados_avaliacao.3 == i %}selected{% endif %}>{{ i }}</option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
+
+    <!-- Comentário -->
+    <div class="mb-6">
+      <label class="font-semibold">Comentário:</label>
+      <textarea name="comentario" rows="4" class="w-full rounded-lg px-4 py-2 border resize-none" {% if dados_avaliacao.3 %}readonly{% endif %}>{{ dados_avaliacao.4|default_if_none:'' }}</textarea>
+    </div>
+
+    {% if not dados_avaliacao.3 %}
+    <div class="flex justify-center">
+      <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white font-semibold px-8 py-2 rounded-full">Salvar Avaliação</button>
+    </div>
+    {% endif %}
+  </form>
+</div>
+
+{% endblock %}
+

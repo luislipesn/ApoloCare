@@ -1,23 +1,24 @@
+from datetime import datetime
 from django.shortcuts import redirect, render
 from psycopg2 import sql
 from ApoloCare.decorators import usuario_logado
 from ApoloCare.database import conectar_banco
+from django.contrib import messages
+
+
+def exclusao_avaliacao(request):
+    try:
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        query = sql.SQL("DELETE FROM avaliacao_atendimento WHERE id_consulta = %s")
+        cursor.execute(query, (request.POST["id"],))
+    except Exception as e:
+        print(f"Erro ao excluir avaliação: {e}")
 
 
 @usuario_logado
-def exclusao_avaliacao (id):
-
-    conn = conectar_banco()
-    cursor = conn.cursor()
-
-    query = sql.SQL("DELETE FROM avaliacao_atendimento WHERE id_consulta = %s")
-    cursor.execute(query, (id,))
-    conn.commit()
-    conn.close()
-    cursor.close()
-
-@usuario_logado
-def inserir_avaliacao():
+def inserir_avaliacao(request):
     conn = conectar_banco()
     cursor = conn.cursor()
 
@@ -38,14 +39,17 @@ def listar_avaliacoes(request):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    if request.session['tipo_usuario'] == 'A':
-        cursor.execute("""
-            SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario
+    if request.session["tipo_usuario"] == "A":
+        cursor.execute(
+            """
+            SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario, a.id_avaliacao_atendimento
             FROM avaliacao_atendimento a, consulta c, nutricionista n
             WHERE a.id_consulta = c.id_consulta
             AND c.id_nutricionista = n.id_nutricionista
             ORDER BY c.dt_consulta DESC, c.hr_consulta DESC
-        """)
+            """
+        )
+
         resultados = cursor.fetchall()
         conn.close()
 
@@ -57,14 +61,19 @@ def listar_avaliacoes(request):
                 "nome_nutricionista": row[3],
                 "nota": row[4],
                 "comentario": row[5],
+                "id_avaliacao": row[6],
             }
             for row in resultados
         ]
-    elif request.session['tipo_usuario'] == 'P':
-        cursor.execute(""" SELECT id_paciente FROM Consulta c, Avaliacao_atendimento a WHERE a.id_consulta = c.id_consulta""")
+    elif request.session["tipo_usuario"] == "P":
+        cursor.execute(
+            """ SELECT id_paciente FROM Consulta c, Avaliacao_atendimento a WHERE a.id_consulta = c.id_consulta"""
+        )
         resultado = cursor.fetchone()
 
-        query = sql.SQL("SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario FROM avaliacao_atendimento a, consulta c, nutricionista n WHERE a.id_consulta = c.id_consulta AND c.id_nutricionista = n.id_nutricionista AND a.id_consulta = %s ORDER BY c.dt_consulta DESC, c.hr_consulta DESC")
+        query = sql.SQL(
+            "SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario FROM avaliacao_atendimento a, consulta c, nutricionista n WHERE a.id_consulta = c.id_consulta AND c.id_nutricionista = n.id_nutricionista AND a.id_consulta = %s ORDER BY c.dt_consulta DESC, c.hr_consulta DESC"
+        )
         cursor.execute(query, (resultado,))
         resultados = cursor.fetchall()
         conn.close()
@@ -77,6 +86,7 @@ def listar_avaliacoes(request):
                 "nome_nutricionista": row[3],
                 "nota": row[4],
                 "comentario": row[5],
+                "id_avaliacao": row[6],
             }
             for row in resultados
         ]
@@ -85,8 +95,68 @@ def listar_avaliacoes(request):
 
     return render(request, "avaliacoes.html", {"avaliacoes": avaliacoes})
 
+
 @usuario_logado
 def avaliacao_atendimento(request):
-    print("Oi")
+    id_avaliacao = request.POST.get("id_avaliacao")
 
+    dados_avaliacao = None
+
+    if id_avaliacao:
+        try:
+            conn = conectar_banco()
+            cursor = conn.cursor()
+
+            query = sql.SQL(
+            """
+            SELECT a.id_avaliacao_atendimento, c.dt_consulta, c.hr_consulta, a.nota, a.comentario, a.id_consulta
+            FROM avaliacao_atendimento a, Consulta c 
+            WHERE a.id_consulta = c.id_consulta
+            AND a.id_avaliacao_atendimento = %s
+            """
+            )
+
+            cursor.execute(query, (id_avaliacao,))
+            dados_avaliacao = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            messages.error(request, f"Erro ao buscar avaliação: {str(e)}")
+
+    contexto = {"dados_avaliacao": dados_avaliacao}
+    return render(request, "avaliacao_atendimento.html", contexto)
+
+def avaliar(request):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+
+    dt_avaliacao = datetime.now().date()
+    hr_avaliacao = datetime.now().time()
+
+    nota = request.POST.get('nota')
+    comentario = request.POST.get('comentario')
+    id_avaliacao = request.POST.get('id_avaliacao_atendimento')
+
+    if not all([nota, comentario, id_avaliacao]):
+        messages.error(request, "Dados incompletos para avaliação.")
+        cursor.close()
+        conn.close()
+        return redirect("avaliacao")
+
+    try:
+        cursor.execute("""
+            UPDATE avaliacao_atendimento
+            SET dt_avaliacao = %s, hr_avaliacao = %s, nota = %s, comentario = %s
+            WHERE id_avaliacao_atendimento = %s
+        """, (dt_avaliacao, hr_avaliacao, nota, comentario, id_avaliacao))
+        conn.commit()
+        messages.success(request, "Avaliação atualizada com sucesso.")
+    except Exception as e:
+        messages.error(request, f"Erro ao atualizar avaliação: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect("avaliacao")
 # Create your views here.

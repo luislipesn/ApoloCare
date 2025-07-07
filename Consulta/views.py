@@ -74,29 +74,37 @@ def cadastro_consulta(request):
 
     return render(request, "cadastro_consulta.html", contexto)
 
+@usuario_logado
 def deletar_consulta(request):
     if request.session["tipo_usuario"] == 'A':
         
         try:
 
-            id_consulta = request.POST['id']
-            exclusao_avaliacao(request, id_consulta)
+            exclusao_avaliacao(request)
         
             conn = conectar_banco()
             cursor = conn.cursor()
 
             query = sql.SQL("DELETE FROM Consulta WHERE id_consulta = %s")
-            cursor.execute(query,(id_consulta,))
+            cursor.execute(query,(request.POST['id'],))
             conn.commit()
 
             cursor.close()
             conn.close()
         
         except Exception as e:
+            if conn:
+                conn.rollback()  # desfaz tudo que foi feito antes do commit
             messages.error(request, f"{str(e)}")
             return redirect(request, "consulta")
-    messages.error(request, f"Você não tem permissão para excluir!")
-    return redirect(request, "consulta")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+    else:
+        messages.error(request, f"Você não tem permissão para excluir!")
+    return redirect("consulta")
 
 def incluir_consulta(request):
     if request.method == "POST":
@@ -142,7 +150,7 @@ def incluir_consulta(request):
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, [dt_consulta, hr_consulta, altura, peso, bioimpedancia, observacoes, id_paciente, id_nutricionista, id_usuario])
                 conn.commit()
-                inserir_avaliacao()
+                inserir_avaliacao(request)
 
             
             messages.success(request, "Consulta salva com sucesso.")
