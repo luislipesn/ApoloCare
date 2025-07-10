@@ -20,7 +20,7 @@
     {% if dados_avaliacao %}
     <input type="hidden" name="id_avaliacao_atendimento" value="{{ dados_avaliacao.0 }}">
     {% endif %}
-    <input type="hidden" name="id_consulta" value="{{ dados_avaliacao.5 }}">
+    <input type="hidden" name="id_consulta" value="{{ dados_avaliacao.0 }}">
 
     <!-- Data e Hora da Avaliação -->
     <div class="grid grid-cols-2 gap-4 mb-4">
@@ -33,7 +33,6 @@
         <input type="time" name="hr_avaliacao" value="{{ dados_avaliacao.2|time:'H:i' }}" class="w-full rounded-full px-4 py-2 border" required readonly>
       </div>
     </div>
-
     <!-- Nota -->
     <div class="mb-4">
       <label class="font-semibold">Nota (1 a 5):</label>

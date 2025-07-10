@@ -14,7 +14,12 @@ def consulta(request):
         cursor = conn.cursor()
 
         if request.session['tipo_usuario'] == "N":
-            id_nutricionista = request.session.get("id_usuario")
+            query = sql.SQL("""
+                SELECT id_nutricionista FROM Nutricionista WHERE id_usuario = %s
+            """)
+            cursor.execute(query, (request.session['id_usuario'],))
+            id_nutricionista = cursor.fetchone()
+            #id_nutricionista = request.session.get("id_usuario")
             query = sql.SQL("""
                 SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
                        c.dt_consulta, c.hr_consulta, c.peso, c.altura 

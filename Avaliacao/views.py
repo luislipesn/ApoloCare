@@ -66,20 +66,36 @@ def listar_avaliacoes(request):
             for row in resultados
         ]
     elif request.session["tipo_usuario"] == "P":
-        cursor.execute(
-            """ SELECT id_paciente FROM Consulta c, Avaliacao_atendimento a WHERE a.id_consulta = c.id_consulta"""
-        )
-        resultado = cursor.fetchone()
+        query = sql.SQL(
+            """ SELECT p.id_paciente 
+                FROM Consulta c, Avaliacao_atendimento a, Paciente p 
+                WHERE a.id_consulta = c.id_consulta 
+                AND p.id_paciente = c.id_paciente 
+                AND p.id_usuario=%s"""
+        )   
+        cursor.execute(query, (request.session["id_usuario"],))
+        resultado = cursor.fetchone()  # resultado is a tuple like (id_paciente,)
+        if resultado is None:
+            # handle no patient found
+            avaliacoes = []
+        else:
+            id_paciente = resultado[0]
 
         query = sql.SQL(
-            "SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario FROM avaliacao_atendimento a, consulta c, nutricionista n WHERE a.id_consulta = c.id_consulta AND c.id_nutricionista = n.id_nutricionista AND a.id_consulta = %s ORDER BY c.dt_consulta DESC, c.hr_consulta DESC"
+            "SELECT a.id_consulta, c.dt_consulta, c.hr_consulta, n.nome, a.nota, a.comentario, a.id_avaliacao_atendimento "
+            "FROM avaliacao_atendimento a, consulta c, nutricionista n "
+            "WHERE a.id_consulta = c.id_consulta "
+            "AND c.id_nutricionista = n.id_nutricionista "
+            "AND c.id_paciente = %s "
+            "ORDER BY c.dt_consulta DESC, c.hr_consulta DESC"
         )
-        cursor.execute(query, (resultado,))
+        cursor.execute(query, (id_paciente,))
         resultados = cursor.fetchall()
         conn.close()
 
         avaliacoes = [
-            {
+            {   
+
                 "id_consulta": row[0],
                 "dt_consulta": row[1],
                 "hr_consulta": row[2],
@@ -90,6 +106,7 @@ def listar_avaliacoes(request):
             }
             for row in resultados
         ]
+
     else:
         return redirect("home")
 
@@ -108,7 +125,7 @@ def avaliacao_atendimento(request):
             cursor = conn.cursor()
 
             query = sql.SQL(
-            """
+                """
             SELECT a.id_avaliacao_atendimento, c.dt_consulta, c.hr_consulta, a.nota, a.comentario, a.id_consulta
             FROM avaliacao_atendimento a, Consulta c 
             WHERE a.id_consulta = c.id_consulta
@@ -120,12 +137,15 @@ def avaliacao_atendimento(request):
             dados_avaliacao = cursor.fetchone()
             cursor.close()
             conn.close()
-            
+
+            print(dados_avaliacao)
+
         except Exception as e:
             messages.error(request, f"Erro ao buscar avaliação: {str(e)}")
 
     contexto = {"dados_avaliacao": dados_avaliacao}
     return render(request, "avaliacao_atendimento.html", contexto)
+
 
 def avaliar(request):
     conn = conectar_banco()
@@ -134,9 +154,13 @@ def avaliar(request):
     dt_avaliacao = datetime.now().date()
     hr_avaliacao = datetime.now().time()
 
-    nota = request.POST.get('nota')
-    comentario = request.POST.get('comentario')
-    id_avaliacao = request.POST.get('id_avaliacao_atendimento')
+    nota = request.POST.get("nota")
+    comentario = request.POST.get("comentario")
+    id_avaliacao = request.POST.get("id_avaliacao_atendimento")
+    print(dt_avaliacao)
+    print(hr_avaliacao)
+    print(comentario)
+    print(id_avaliacao)
 
     if not all([nota, comentario, id_avaliacao]):
         messages.error(request, "Dados incompletos para avaliação.")
@@ -145,11 +169,14 @@ def avaliar(request):
         return redirect("avaliacao")
 
     try:
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE avaliacao_atendimento
             SET dt_avaliacao = %s, hr_avaliacao = %s, nota = %s, comentario = %s
             WHERE id_avaliacao_atendimento = %s
-        """, (dt_avaliacao, hr_avaliacao, nota, comentario, id_avaliacao))
+        """,
+            (dt_avaliacao, hr_avaliacao, nota, comentario, id_avaliacao),
+        )
         conn.commit()
         messages.success(request, "Avaliação atualizada com sucesso.")
     except Exception as e:
@@ -159,4 +186,6 @@ def avaliar(request):
         conn.close()
 
     return redirect("avaliacao")
+
+
 # Create your views here.
