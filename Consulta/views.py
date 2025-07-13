@@ -164,8 +164,7 @@ def incluir_consulta(request):
         except Exception as e:
             conn.rollback()
             messages.error(request, f"Erro ao salvar consulta: {str(e)}")
-        
-        
+         
         return redirect("consulta")  # Ajuste para o nome real da URL de listagem
 
     
