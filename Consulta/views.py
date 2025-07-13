@@ -38,9 +38,9 @@ def consulta(request):
             query = sql.SQL("""
                 SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
                        c.dt_consulta, c.hr_consulta, c.peso, c.altura 
-                FROM Consulta c 
-                JOIN Paciente p ON c.id_paciente = p.id_paciente  
-                JOIN Nutricionista n ON c.id_nutricionista = n.id_nutricionista
+                FROM Consulta c, Paciente p, Nutricionista n
+                WHERE c.id_paciente = p.id_paciente  
+                AND c.id_nutricionista = n.id_nutricionista
             """)
             cursor.execute(query)
 
