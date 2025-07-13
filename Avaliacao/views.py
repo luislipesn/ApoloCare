@@ -22,8 +22,8 @@ def inserir_avaliacao(request):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    query = sql.SQL("SELECT MAX(id_consulta) FROM Consulta")
-    cursor.execute(query)
+    query = sql.SQL("SELECT MAX(id_consulta) FROM Consulta WHERE id_usuario=%s")
+    cursor.execute(query,(request.session['id_usuario'],))
 
     consulta = cursor.fetchone()
 

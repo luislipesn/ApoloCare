@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consulta de Usuários{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-cyan-400 to-blue-800 p-6 text-white">
+  <h1 class="text-2xl font-bold text-center mb-6">Consulta de Usuários</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="text-center rounded-full py-2 my-2
+      {% if message.tags == 'success' %}
+        bg-green-600 text-white
+      {% elif message.tags == 'error' %}
+        bg-red-600 text-white
+      {% elif message.tags == 'warning' %}
+        bg-yellow-500 text-black
+      {% elif message.tags == 'info' %}
+        bg-blue-500 text-white
+      {% else %}
+        bg-gray-300 text-black
+      {% endif %}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Botões de ação -->
+  <div class="flex justify-between max-w-6xl mx-auto mb-4">
+    <a href="{% url 'home' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-full font-semibold">
+      ← Retornar
+    </a>
+    <a href="{% url 'cadastro_usuario' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full font-semibold">
+      + Cadastrar Usuário
+    </a>
+  </div>
+
+  <!-- Tabela de usuários -->
+  <div class="overflow-x-auto max-w-6xl mx-auto">
+    <table class="w-full bg-white text-black rounded shadow-md border">
+      <thead class="bg-blue-700 text-white">
+        <tr>
+          <th class="px-4 py-2 ">Código</th>
+          <th class="px-4 py-2">Nome</th>
+          <th class="px-4 py-2">Login</th>
+          <th class="px-4 py-2">Tipo</th>
+          <th class="px-4 py-2">Status</th>
+          <th class="px-4 py-2 text-center">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in usuarios %}
+        <tr class="{% cycle 'bg-gray-100' 'bg-white' %} border-t">
+          <td class="px-4 py-2 text-center">{{ user.0 }}</td>
+          <td class="px-4 py-2">{{ user.1 }}</td>
+          <td class="px-4 py-2">{{ user.2 }}</td>
+          <td class="px-4 py-2">
+            {% if user.4 == 'A' %}
+              Administrador
+            {% elif user.4 == 'P' %}
+              Paciente
+            {% elif user.4 == 'N' %}
+              Nutricionista
+            {% else %}
+              {{ user.4 }}
+            {% endif %}
+          </td>
+          <td class="px-4 py-2">
+            {% if user.3 %}
+              <span class="text-green-700 font-semibold">Ativo</span>
+            {% else %}
+              <span class="text-red-700 font-semibold">Inativo</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-2 text-center">
+            <form method="POST" action="{% url 'alterar_status' %}">
+              {% csrf_token %}
+              <input type="hidden" name="id_usuario" value="{{ user.0 }}">
+              {% if user.3 %}
+              <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-full text-sm">Inativar</button>
+              {% else %}
+              <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-full text-sm">Ativar</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center px-4 py-2">Nenhum usuário encontrado.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

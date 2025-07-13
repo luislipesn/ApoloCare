@@ -78,16 +78,17 @@
         <input type="text" name="convenio" value="{{ dados_paciente.8|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" maxlength="50">
       </div>
     </div>
-
+    {% if not dados_paciente %}
     <div class="flex flex-col mb-4">
-  <label for="id_usuario" class="text-black font-semibold mb-1">Vincular a Usuário:</label>
-  <select name="id_usuario" class="bg-white rounded-full px-4 py-2 border border-gray-300" required>
-    <option value="">Selecione o usuário</option>
-    {% for user in usuarios %}
-      <option value="{{ user.0 }}" {% if dados_paciente and dados_paciente.9 == user.0 %}selected{% endif %}>{{ user.1 }}</option>
-    {% endfor %}
-  </select>
-</div>
+      <label for="id_usuario" class="text-black font-semibold mb-1">Vincular a Usuário:</label>
+      <select name="id_usuario" class="bg-white rounded-full px-4 py-2 border border-gray-300" required>
+        <option value="">Selecione o usuário</option>
+        {% for user in usuarios %}
+        <option value="{{ user.0 }}" {% if dados_paciente and dados_paciente.9 == user.0 %}selected{% endif %}>{{ user.1 }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
 
 
     <!-- Botões -->
@@ -95,7 +96,7 @@
       <a href="{% url 'paciente' %}" class="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-8 py-2 rounded-full">
         Cancelar
       </a>
-      <button type="submit" class="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-8 py-2 rounded-full">
+      <button type="submit" class="bg-indigo-800 hover:bg-indigo-900 text-white font-semibold px-8 py-2 rounded-full" >
         Salvar
       </button>
     </div>

@@ -39,7 +39,7 @@
           <form method="POST" action="{% url 'avaliacao_atendimento' %}">
             {% csrf_token %}
             <input type="hidden" name="id_avaliacao" value="{{ avaliacao.id_avaliacao }}">
-            <button type="submit" class="bg-indigo-800 hover:bg-indigo-900 text-white text-sm font-semibold px-4 py-1 rounded-full">
+            <button type="submit" class="bg-indigo-800 hover:bg-indigo-900 text-white text-sm font-semibold px-4 py-1 rounded-full" {% if request.session.tipo_usuario != "P" %} disabled {% endif %}>
               Avaliar
             </button>
           </form>

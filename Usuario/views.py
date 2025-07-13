@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from psycopg2 import sql
 from django.contrib.auth import logout
+from ApoloCare.decorators import usuario_logado
 from ApoloCare.database import conectar_banco
 
 # Create your views here.
@@ -103,7 +104,7 @@ def inclusao_usuario(request):
             cursor.close()
             conn.close()
         if request.session['id_usuario']:
-             return redirect("home")   
+             return redirect("usuario")   
         return redirect("login")
     except Exception as e:
         messages.error(
@@ -111,3 +112,48 @@ def inclusao_usuario(request):
         )  # CASO DÊ ERRO NA CONEXÃO COM O BANCO
 
     return redirect("cadastro_usuario")
+
+@usuario_logado
+def listar_usuarios(request):
+    #try:
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id_usuario, nome, login, ativo, tipo_usuario FROM Usuario
+        """)
+        usuarios = cursor.fetchall()
+
+        conn.close()
+        return render(request, "usuarios.html", {"usuarios": usuarios})
+
+    #except Exception as e:
+        #messages.error(request, f"Erro ao buscar usuários: {str(e)}")
+        #return redirect("home")
+    
+@usuario_logado
+def alterar_status(request):
+    if request.method == "POST":
+        id_usuario = request.POST.get("id_usuario")
+
+        try:
+            conn = conectar_banco()
+            cursor = conn.cursor()
+
+            # Alternar status
+            cursor.execute("""
+                UPDATE Usuario
+                SET ativo = NOT ativo
+                WHERE id_usuario = %s
+            """, (id_usuario,))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            messages.success(request, "Status do usuário atualizado com sucesso.")
+        except Exception as e:
+            messages.error(request, f"Erro ao atualizar status: {str(e)}")
+
+    return redirect("usuario")
+

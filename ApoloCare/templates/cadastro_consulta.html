@@ -20,29 +20,29 @@
     <div class="grid grid-cols-3 gap-4 mb-4">
       <div>
         <label for="dt_consulta" class="font-semibold">Data da Consulta:</label>
-        <input type="date" id="dt_consulta" name="dt_consulta" value="{% if dados_consulta and dados_consulta.1 %}{{ dados_consulta.1|date:'Y-m-d' }}{% endif %}" class="w-full rounded-full px-4 py-2" required>
+        <input type="date" id="dt_consulta" name="dt_consulta" value="{% if dados_consulta and dados_consulta.1 %}{{ dados_consulta.1|date:'Y-m-d' }}{% endif %}" class="w-full rounded-full px-4 py-2" required {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
       </div>
 
       <div>
         <label for="hr_consulta" class="font-semibold">Hora:</label>
-        <input type="time" id="hr_consulta" name="hr_consulta" value="{% if dados_consulta and dados_consulta.2 %}{{ dados_consulta.2|time:'H:i' }}{% endif %}" class="w-full rounded-full px-4 py-2" required>
+        <input type="time" id="hr_consulta" name="hr_consulta" value="{% if dados_consulta and dados_consulta.2 %}{{ dados_consulta.2|time:'H:i' }}{% endif %}" class="w-full rounded-full px-4 py-2" required {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
       </div>
 
       <div>
         <label for="bioimpedancia" class="font-semibold">Bioimpedância:</label>
-        <input type="text" id="bioimpedancia" name="bioimpedancia" value="{{ dados_consulta.5|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" maxlength="100">
+        <input type="text" id="bioimpedancia" name="bioimpedancia" value="{{ dados_consulta.5|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" maxlength="100" {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
       </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-4">
       <div>
         <label for="altura" class="font-semibold">Altura (m):</label>
-        <input type="text" id="altura" name="altura" value="{{ dados_consulta.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
+        <input type="text" id="altura" name="altura" value="{{ dados_consulta.3|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
       </div>
 
       <div>
         <label for="peso" class="font-semibold">Peso (kg):</label>
-        <input type="text" id="peso" name="peso" value="{{ dados_consulta.4|default_if_none:'' }}" class="w-full rounded-full px-4 py-2">
+        <input type="text" id="peso" name="peso" value="{{ dados_consulta.4|default_if_none:'' }}" class="w-full rounded-full px-4 py-2" {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
       </div>
 
       {% if dados_consulta %}
@@ -55,13 +55,13 @@
 
     <div class="mb-4">
       <label for="observacoes" class="font-semibold">Observações:</label>
-      <textarea name="observacoes" id="observacoes" rows="3" maxlength="255" class="w-full rounded-lg px-4 py-2">{{ dados_consulta.6|default_if_none:'' }}</textarea>
+      <textarea name="observacoes" id="observacoes" rows="3" maxlength="255" class="w-full rounded-lg px-4 py-2" {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>{{ dados_consulta.6|default_if_none:'' }}</textarea>
     </div>
 
     <div class="grid grid-cols-3 gap-4 mb-6">
       <div>
         <label for="id_paciente" class="font-semibold">Paciente:</label>
-        <select name="id_paciente" id="id_paciente" class="w-full rounded-full px-4 py-2 border border-gray-300" required>
+        <select name="id_paciente" id="id_paciente" class="w-full rounded-full px-4 py-2 border border-gray-300" required {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
           <option value="" disabled selected>Selecione</option>
           {% for paciente in pacientes %}
             <option value="{{ paciente.0 }}" {% if dados_consulta.7 == paciente.0 %}selected{% endif %}>{{ paciente.1 }}</option>
@@ -71,7 +71,7 @@
 
       <div>
         <label for="id_nutricionista" class="font-semibold">Nutricionista:</label>
-        <select name="id_nutricionista" id="id_nutricionista" class="w-full rounded-full px-4 py-2 border border-gray-300" required>
+        <select name="id_nutricionista" id="id_nutricionista" class="w-full rounded-full px-4 py-2 border border-gray-300" required {% if request.session.tipo_usuario == 'P' %} readonly {% endif %}>
           <option value="" disabled selected>Selecione</option>
           {% for nutri in nutricionistas %}
             <option value="{{ nutri.0 }}" {% if dados_consulta.8 == nutri.0 %}selected{% endif %}>{{ nutri.1 }}</option>
@@ -84,9 +84,11 @@
       <a href="{% url 'consulta' %}" class="bg-red-700 hover:bg-red-800 text-white font-semibold px-4 py-2 rounded-md">
         Cancelar
       </a>
+      {% if request.session.tipo_usuario != 'P' %}
       <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-semibold px-4 py-2 rounded-md">
         Salvar
       </button>
+      {% endif %}
     </div>
   </form>
 </div>

@@ -15,20 +15,25 @@ def consulta(request):
 
         if request.session['tipo_usuario'] == "N":
             query = sql.SQL("""
-                SELECT id_nutricionista FROM Nutricionista WHERE id_usuario = %s
+                SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
+                c.dt_consulta, c.hr_consulta, c.peso, c.altura
+                FROM Consulta c, Paciente p, Nutricionista n
+                WHERE c.id_paciente = p.id_paciente
+                AND c.id_nutricionista = n.id_nutricionista
+                AND n.id_usuario = %s
             """)
             cursor.execute(query, (request.session['id_usuario'],))
-            id_nutricionista = cursor.fetchone()
-            #id_nutricionista = request.session.get("id_usuario")
+
+        elif request.session['tipo_usuario'] == "P":
             query = sql.SQL("""
                 SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
-                       c.dt_consulta, c.hr_consulta, c.peso, c.altura 
-                FROM Consulta c 
-                JOIN Paciente p ON c.id_paciente = p.id_paciente  
-                JOIN Nutricionista n ON c.id_nutricionista = n.id_nutricionista 
-                WHERE n.id_nutricionista = %s
+                c.dt_consulta, c.hr_consulta, c.peso, c.altura
+                FROM Consulta c, Paciente p, Nutricionista n
+                WHERE c.id_paciente = p.id_paciente
+                AND c.id_nutricionista = n.id_nutricionista
+                AND p.id_usuario = %s
             """)
-            cursor.execute(query, (id_nutricionista,))
+            cursor.execute(query, (request.session['id_usuario'],))
         else:
             query = sql.SQL("""
                 SELECT c.id_consulta, p.nome AS paciente, n.nome AS nutricionista, 
@@ -117,8 +122,8 @@ def incluir_consulta(request):
         dt_consulta = request.POST.get("dt_consulta")
         hr_consulta = request.POST.get("hr_consulta")
         
-        altura = float(request.POST.get("altura").replace(",", "."))
-        peso = float(request.POST.get("peso").replace(",", "."))
+        altura = float(request.POST.get("altura", "0").replace(",", ".") or 0.0)
+        peso = float(request.POST.get("peso", "0").replace(",", ".") or 0.0)
         bioimpedancia = request.POST.get("bioimpedancia")
         observacoes = request.POST.get("observacoes")
         id_paciente = request.POST.get("id_paciente")

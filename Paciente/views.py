@@ -4,6 +4,9 @@ from django.shortcuts import redirect, render
 from psycopg2 import sql
 from ApoloCare.database import conectar_banco
 from ApoloCare.decorators import usuario_logado
+from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 @usuario_logado
 def paciente(request):
@@ -26,11 +29,6 @@ def cadastro_paciente(request):
     conn = conectar_banco()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id_usuario, nome FROM usuario WHERE tipo_usuario = 'P'")
-    usuarios = cursor.fetchall()
-
-    contexto = {"usuarios": usuarios}
-
     id = request.POST.get('id', None)
     if id:
         query = sql.SQL(
@@ -38,8 +36,12 @@ def cadastro_paciente(request):
         )
         cursor.execute(query, (id,))
         resultado = cursor.fetchone()
-        contexto = {"usuarios": usuarios,
-                    "dados_paciente" : resultado}
+        contexto = {"dados_paciente" : resultado}
+    else:
+        cursor.execute("SELECT id_usuario, nome FROM usuario u WHERE tipo_usuario = 'P' AND id_usuario NOT IN (SELECT id_usuario FROM Paciente)")
+        usuarios = cursor.fetchall()
+        contexto = {"usuarios": usuarios}
+
     cursor.close()
     conn.close()
     return render(request, "cadastro_paciente.html", contexto)
@@ -58,7 +60,6 @@ def inclusao_paciente(request):
             telefone = re.sub(r"\D", "", request.POST["telefone"])
             email = request.POST["email"]
             convenio = request.POST["convenio"]
-            id_usuario = request.POST["id_usuario"]
 
 
             conn = conectar_banco()
@@ -68,12 +69,13 @@ def inclusao_paciente(request):
             if id:
                 query = sql.SQL("""
                 UPDATE Paciente
-                SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s, id_usuario=%s
+                SET nome=%s, dt_nasc=%s, cpf=%s, sexo=%s, endereco=%s, telefone=%s, email=%s, convenio=%s
                 WHERE id_paciente = %s;
                 """)
-                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario, id))
+                cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id))
                 messages.success(request, f"Alterado com sucesso!")
             else:
+                id_usuario = request.POST["id_usuario"]
                 query = sql.SQL("""
                 INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)

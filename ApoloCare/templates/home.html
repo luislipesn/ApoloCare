@@ -40,8 +40,14 @@
             {% if request.session.tipo_usuario == "A" %}
             <a href="{% url 'avaliacao' %}">
                 <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
-                    <img src="{% static 'images/avaliacao.png' %}" alt="Nutricionista" class="mx-auto h-24 mb-2" />
-                    <p class="font-semibold">Avaliar Consulta</p>
+                    <img src="{% static 'images/avaliacao.png' %}" alt="Avaliação" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Avaliações</p>
+                </div>
+            </a>
+            <a href="{% url 'usuario' %}">
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/usuario.png' %}" alt="Usuários" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Usuário</p>
                 </div>
             </a>
             {% endif %}
@@ -84,6 +90,12 @@
                 <p class="font-semibold">Avaliar Consulta</p>
             </div>
         </a>
+        <a href="{% url 'consulta' %}">
+                <div class="bg-blue-800 text-white px-6 py-4 rounded-2xl text-center w-40 hover:scale-105 transition">
+                    <img src="{% static 'images/consulta.png' %}" alt="Consultas" class="mx-auto h-24 mb-2" />
+                    <p class="font-semibold">Consultas</p>
+                </div>
+            </a>
     </div>
     {% endif %}
     </div>
