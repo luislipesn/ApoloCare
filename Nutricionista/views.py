@@ -98,12 +98,20 @@ def excluir_nutricionista(request):
             conn = conectar_banco() 
             cursor = conn.cursor()
 
+            query = sql.SQL("SELECT id_nutricionista FROM Consulta WHERE id_nutricionista = %s")
+            cursor.execute(query, (id,))
+            nutri = cursor.fetchone()
+
+            if nutri:
+                messages.error(request, f"O nutricionista está vinculado a uma consulta.")
+                return redirect("nutricionista")
+
             query = sql.SQL("DELETE FROM Nutricionista WHERE id_nutricionista = %s") #Script de exclusão
             cursor.execute(query, (id,))
             conn.commit()
             cursor.close()
             conn.close()
-            messages.error(request, f"Excluído com sucesso!")
+            messages.success(request, f"Excluído com sucesso!")
         return redirect("nutricionista") #Retorno para a consulta de nutricionista
     except Exception as e:
         messages.error(

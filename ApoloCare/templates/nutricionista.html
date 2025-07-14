@@ -16,10 +16,21 @@
       <img src="{% static 'images/incluir.png' %}" alt="Incluir" class="ml-2 w-5">
     </a>
   </div>
-  {% if messages %}
-  {% for message in messages %}
-  {{ message }}
-  {% endfor %}
+    {% if messages %}
+    {% for message in messages %}
+      <div class="text-center rounded-full py-2 my-2
+      {% if message.tags == 'success' %}
+        bg-green-600 text-white
+      {% elif message.tags == 'error' %}
+        bg-red-600 text-white
+      {% elif message.tags == 'warning' %}
+        bg-yellow-500 text-black
+      {% elif message.tags == 'info' %}
+        bg-blue-500 text-white
+      {% else %}
+        bg-gray-300 text-black
+      {% endif %}">{{ message }}</div>
+    {% endfor %}
   {% endif %}
   <!-- Tabela -->
   <div class="overflow-x-auto">

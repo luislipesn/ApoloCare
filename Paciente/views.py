@@ -98,9 +98,18 @@ def exclusao_paciente(request):
             conn = conectar_banco() 
             cursor = conn.cursor()
 
-            query = sql.SQL("DELETE FROM Paciente WHERE id_paciente = %s") #Script de exclusão
+            query = sql.SQL("SELECT id_paciente FROM Consulta WHERE id_paciente =%s")
             cursor.execute(query, (id,))
-            conn.commit()
+            paciente = cursor.fetchone()
+            if paciente:
+                messages.error(request, f"O Paciente está cadastrado a uma consulta.")
+                cursor.close()
+                conn.close()
+                return redirect("paciente")
+            else:
+                query = sql.SQL("DELETE FROM Paciente WHERE id_paciente = %s") #Script de exclusão
+                cursor.execute(query, (id,))
+                conn.commit()
             cursor.close()
             conn.close()
             messages.success(request, f"Excluído com sucesso!")
