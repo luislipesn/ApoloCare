@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from psycopg2 import sql
 import re
+from Usuario.views import inclusao_nutri_paciente
 from ApoloCare.decorators import usuario_logado
 from ApoloCare.database import conectar_banco
 
@@ -64,22 +65,35 @@ def inclusao_nutricionista(request):
             sexo = request.POST["sexo"]
             email = request.POST["email"]
 
-            conn = conectar_banco() #Conexão com o banco de dados
+            conn = conectar_banco()
             cursor = conn.cursor()
-            id = request.POST.get('id_nutricionista', None) #Se estiver chegando o 'id_nutricionista' atribuir a variavel 'id', caso não venha, atribuir como None/Nulo
 
-            if id: #Caso tenha um ID, ele será um update
-                query = sql.SQL(
-                    "UPDATE Nutricionista SET nome=%s, cpf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s WHERE id_nutricionista=%s"
-                )
+            id = request.POST.get('id_nutricionista', None)
+
+            if id:
+                # Atualização do nutricionista existente
+                query = sql.SQL("""
+                    UPDATE Nutricionista 
+                    SET nome=%s, cpf=%s, crn=%s, dt_nasc=%s, sexo=%s, telefone=%s, email=%s 
+                    WHERE id_nutricionista=%s
+                """)
                 cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id))
-                messages.error(request, f"Alterado com sucesso!")
-            else: #Caso não, ele será um insert
-                id_usuario = request.POST["id_usuario"]
-                query = sql.SQL(
-                    "INSERT INTO Nutricionista (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                )
+                messages.success(request, "Nutricionista alterado com sucesso!")
+            else:
+            # Inclusão de novo nutricionista
+                inclusao_nutri_paciente(request)
+                query = sql.SQL("SELECT id_usuario FROM Usuario WHERE cpf = %s")
+                cursor.execute(query, (cpf,))
+                id_usuario = cursor.fetchone()
+                id_usuario = id_usuario[0]
+
+                query = sql.SQL("""
+                    INSERT INTO Nutricionista (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """)
                 cursor.execute(query, (nome, cpf, crn, dt_nasc, sexo, telefone, email, id_usuario))
+                messages.success(request, "Nutricionista cadastrado com sucesso!")
+
             conn.commit()
             cursor.close()
             conn.close()

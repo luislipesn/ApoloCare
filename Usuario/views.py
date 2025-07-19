@@ -104,7 +104,7 @@ def inclusao_usuario(request):
             cursor.close()
             conn.close()
         if request.session['id_usuario']:
-             return redirect("usuario")   
+             return redirect("usuario")  
         return redirect("login")
     except Exception as e:
         messages.error(
@@ -120,7 +120,7 @@ def listar_usuarios(request):
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT id_usuario, nome, login, ativo, tipo_usuario FROM Usuario
+            SELECT id_usuario, nome, login, ativo, tipo_usuario FROM Usuario WHERE tipo_usuario NOT IN ('N', 'P')
         """)
         usuarios = cursor.fetchall()
 
@@ -156,4 +156,47 @@ def alterar_status(request):
             messages.error(request, f"Erro ao atualizar status: {str(e)}")
 
     return redirect("usuario")
+
+def inclusao_nutri_paciente(request):
+    try:
+        if request.method == "POST":
+            nome = request.POST["nome"]
+            dt_nasc = request.POST["dt_nasc"]
+            cpf = re.sub(r"\D", "", request.POST["cpf"])
+            telefone = re.sub(r"\D", "", request.POST["telefone"])
+            tipo_usuario = request.POST["tipo_usuario"]
+            endereco = request.POST["endereco"]
+            login = request.POST["login"].lower()
+            senha = make_password(request.POST["senha"])
+            ativo = True
+
+            #print(ativo)
+
+            conn = conectar_banco()
+            cursor = conn.cursor()
+
+            query = sql.SQL(
+                "INSERT INTO Usuario(nome, dt_nasc, cpf, telefone, endereco, tipo_usuario, login, senha, ativo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            )
+            cursor.execute(
+                query,
+                (
+                    nome,
+                    dt_nasc,
+                    cpf,
+                    telefone,
+                    endereco,
+                    tipo_usuario,
+                    login,
+                    senha,
+                    ativo,
+                ),
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        messages.error(
+            request, f"Erro ao cadastrar: {str(e)}"
+        )  # CASO DÊ ERRO NA CONEXÃO COM O BANCO
 

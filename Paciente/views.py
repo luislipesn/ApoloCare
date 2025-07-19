@@ -2,6 +2,7 @@ from django.contrib import messages
 import re
 from django.shortcuts import redirect, render
 from psycopg2 import sql
+from Usuario.views import inclusao_nutri_paciente
 from ApoloCare.database import conectar_banco
 from ApoloCare.decorators import usuario_logado
 from django.http import JsonResponse
@@ -75,10 +76,21 @@ def inclusao_paciente(request):
                 cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id))
                 messages.success(request, f"Alterado com sucesso!")
             else:
-                id_usuario = request.POST["id_usuario"]
+                
+                inclusao_nutri_paciente(request)
+
+                query = sql.SQL("SELECT id_usuario FROM Usuario WHERE cpf = %s")
+                cursor.execute(query, (cpf,))
+                id_usuario = cursor.fetchone()
+
+                if id_usuario is None:
+                    raise Exception("Usuário não encontrado com o CPF informado.")
+
+                id_usuario = id_usuario[0]
+
                 query = sql.SQL("""
-                INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO paciente(nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """)
                 cursor.execute(query, (nome, dt_nasc, cpf, sexo, endereco, telefone, email, convenio, id_usuario))
 
