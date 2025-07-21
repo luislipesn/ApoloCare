@@ -59,7 +59,7 @@ def inclusao_nutricionista(request):
         if request.method == "POST": #Verifica se os dados estão sendo passado pelo metodo POST
             nome = request.POST["nome"]
             crn = request.POST["crn"]
-            dt_nasc = request.POST["data_nascimento"]
+            dt_nasc = request.POST["dt_nasc"]
             cpf = re.sub(r"\D", "", request.POST["cpf"])
             telefone = re.sub(r"\D", "", request.POST["telefone"])
             sexo = request.POST["sexo"]
