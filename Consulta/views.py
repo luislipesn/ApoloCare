@@ -68,10 +68,10 @@ def cadastro_consulta(request):
         dados_consulta = cursor.fetchone()
 
     # Carregar dados auxiliares para selects
-    cursor.execute("SELECT id_paciente, nome FROM paciente")
+    cursor.execute("SELECT id_paciente, nome FROM paciente ORDER BY nome")
     pacientes = cursor.fetchall()
 
-    cursor.execute("SELECT id_nutricionista, nome FROM nutricionista")
+    cursor.execute("SELECT id_nutricionista, nome FROM nutricionista ORDER BY nome")
     nutricionistas = cursor.fetchall()
 
     cursor.close()

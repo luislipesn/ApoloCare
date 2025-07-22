@@ -13,6 +13,9 @@ def exclusao_avaliacao(request):
 
         query = sql.SQL("DELETE FROM avaliacao_atendimento WHERE id_consulta = %s")
         cursor.execute(query, (request.POST["id"],))
+        conn.commit()
+
+        conn.close()
     except Exception as e:
         print(f"Erro ao excluir avaliação: {e}")
 

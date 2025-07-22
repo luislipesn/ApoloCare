@@ -72,9 +72,12 @@
         <label class="text-black font-semibold mb-1">Sexo:</label>
         <select name="sexo" class="bg-white rounded-full px-4 py-2 border border-gray-300" required>
           <option value="" selected disabled>Selecione</option>
-          <option value="F" {% if dados_nutri.5=="F" %} selected {% endif %}>Feminino</option>
-          <option value="M" {% if dados_nutri.5=="M" %} selected {% endif %}>Masculino</option>
-          <option value="O" {% if dados_nutri.5=="O" %} selected {% endif %}>Outro</option>
+          {% with sexo=dados_nutri.5 %}
+            <option value="F" {% if sexo == "F" %}selected{% endif %}>Feminino</option>
+            <option value="M" {% if sexo == "M" %}selected{% endif %}>Masculino</option>
+            <option value="O" {% if sexo == "O" %}selected{% endif %}>Outro</option>
+          {% endwith %}
+
         </select>
       </div>
 
